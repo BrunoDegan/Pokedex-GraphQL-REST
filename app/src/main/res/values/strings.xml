@@ -3,4 +3,6 @@
     <string name="try_again_label">Tentar novamente</string>
     <string name="http_response_generic_error_message">Erro ao processar sua solicitação! Tente novamente!</string>
     <string name="snackbar_dismiss_text">Ok</string>
+    <string name="pokemon_types_label">Pokemon Types</string>
+    <string name="pokemon_abilities_label">Pokemon Abilities</string>"
 </resources>

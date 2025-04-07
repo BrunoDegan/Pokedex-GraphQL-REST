@@ -4,8 +4,8 @@ import com.brunodegan.pokedex.data.api.GetAllPokemonsGraphQLRequestData
 import com.brunodegan.pokedex.data.api.GraphQLApiService
 import com.brunodegan.pokedex.data.api.RestApiService
 import com.brunodegan.pokedex.data.datasources.PokemonsDataSource
+import com.brunodegan.pokedex.data.models.GetAllPokemonsGraphQLResponseData
 import com.brunodegan.pokedex.data.models.PokemonDetails
-import com.brunodegan.pokedex.data.models.PokemonGraphQLApiDataModel
 import org.koin.core.annotation.Single
 
 @Single
@@ -14,7 +14,7 @@ class PokemonsRemoteDataSourceImpl(
     private val restApi: RestApiService
 ) :
     PokemonsDataSource {
-    override suspend fun getPokemons(): PokemonGraphQLApiDataModel {
+    override suspend fun getPokemons(): GetAllPokemonsGraphQLResponseData {
         return graphQlApi.getAllPokemons(GetAllPokemonsGraphQLRequestData()).data
     }
 

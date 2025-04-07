@@ -12,30 +12,40 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = NaturalGreen,
-    secondary = DarkGreen,
-    tertiary = Green
+    primaryContainer = Color(0xFFFF9800),
+    secondaryContainer = Color.Black,
+    primary = Color.Red,
+    onPrimary = Color.White,
+    secondary = Color.White,
+    onSecondary = Color.LightGray,
+    tertiary = Color.LightGray,
+    onTertiary = Color.White,
+    background = Color.Transparent,
+    onSurface = Color(0xFFA09898),
+    surface = Color(0xFFF44336),
+    onError = Color.Transparent
 )
 
 private val LightColorScheme = lightColorScheme(
-    primaryContainer = Color(0xFFD21010),
-    secondaryContainer = Color(0xFFFFFFFF),
+    primaryContainer = Color(0xFFFF9800),
+    secondaryContainer = Color.Black,
     primary = Color.Red,
-    secondary = Color.White,
-    tertiary = Color.LightGray,
-    background = Color(0xFFD21010),
-    surface = Color(0xFFFFFFFF),
-    onPrimary = Color.Black,
+    onPrimary = Color.White,
+    secondary = Color.LightGray,
     onSecondary = Color.LightGray,
-    onTertiary = Color.DarkGray,
+    tertiary = Color.LightGray,
+    onTertiary = Color.White,
+    background = Color.Transparent,
     onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
+    onSurface = Color(0xFFA09898),
+    surface = Color(0xFFF44336),
+    onError = Color.Transparent
 )
 
 @Composable
 fun PokedexTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {

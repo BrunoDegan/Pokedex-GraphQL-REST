@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -31,7 +32,12 @@ import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.TextUnitType
+import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import coil.decode.SvgDecoder
@@ -185,7 +191,7 @@ private fun PokemonCard(
         Card(
             colors = CardDefaults.elevatedCardColors().copy(
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
-                contentColor = MaterialTheme.colorScheme.secondaryContainer
+                contentColor = MaterialTheme.colorScheme.surface
             ),
             shape = RectangleShape,
             elevation = CardDefaults.cardElevation(dimensionResource(R.dimen.card_elevation)),
@@ -196,9 +202,10 @@ private fun PokemonCard(
                 .fillMaxWidth()
                 .wrapContentHeight()
                 .padding(all = LocalCardsPadding.current)
-                .clickable(enabled = true, onClick = {
-                    onCardClicked.invoke(viewData.id)
-                })
+                .clickable(
+                    onClick = {
+                        onCardClicked.invoke(viewData.id)
+                    })
         ) {
             Row(
                 modifier = Modifier,
@@ -237,20 +244,53 @@ private fun PokemonCard(
                     )
                 }
                 Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.small_padding)),
                     modifier = Modifier
                         .padding(dimensionResource(R.dimen.double_padding))
-                        .wrapContentHeight()
-                        .fillMaxWidth()
+                        .wrapContentSize()
                 ) {
-                    viewData.types.forEach {
-                        Text(
-                            text = it.capitalize(Locale.current),
-                            color = MaterialTheme.colorScheme.tertiary,
-                            modifier = Modifier.padding(
-                                dimensionResource(R.dimen.base_padding),
-                            )
+
+                    Text(
+                        text = viewData.types.joinToString {
+                            it.capitalize(Locale.current)
+                        },
+                        color = MaterialTheme.colorScheme.tertiary,
+                        fontWeight = FontWeight.W600,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(
+                            dimensionResource(R.dimen.small_padding),
                         )
-                    }
+                    )
+                    Text(
+                        text = stringResource(R.string.pokemon_abilities_label),
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = TextUnit(
+                            value = ResourcesCompat.getFloat(
+                                LocalContext.current.resources, R.dimen.abilities_title_font_size
+                            ), type = TextUnitType.Sp
+                        ),
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(
+                            top = dimensionResource(R.dimen.double_padding)
+                        )
+                    )
+                    Text(
+                        text = viewData.abilities.joinToString().capitalize(Locale.current),
+                        color = MaterialTheme.colorScheme.secondary,
+                        fontWeight = FontWeight.W500,
+                        fontSize = TextUnit(
+                            value = ResourcesCompat.getFloat(
+                                LocalContext.current.resources, R.dimen.abilities_font_size
+                            ), type = TextUnitType.Sp
+                        ),
+                        overflow = TextOverflow.Clip,
+                        textAlign = TextAlign.Justify,
+                        modifier = Modifier.padding(
+                            top = dimensionResource(R.dimen.small_padding)
+                        )
+                    )
                 }
             }
         }

@@ -9,20 +9,26 @@ data class GetAllPokemonsGraphQLRequestData(
     val operationName: String = "getItems"
 )
 
-const val GRAPHQL_QUERY = "query getItems {\n" +
-        "          pokemon_v2_pokemon_aggregate {\n" +
-        "            nodes {\n" +
-        "              id\n" +
-        "              name\n" +
-        "              pokemon_v2_pokemontypes {\n" +
-        "                pokemon_v2_type {\n" +
-        "                  name\n" +
-        "                }\n" +
-        "              }\n" +
-        "              pokemon_v2_pokemonsprites {\n" +
-        "                id\n" +
-        "                sprites(path: \"other.dream_world.front_default\")\n" +
-        "              }\n" +
-        "            }\n" +
-        "          }\n" +
-        "        }"
+const val GRAPHQL_QUERY = """
+   query getItems {
+      pokemon: pokemon_v2_pokemon_aggregate {
+        nodes {
+          id
+          name
+          pokemon_v2_pokemontypes {
+            pokemon_v2_type {
+              name
+            }
+          }
+          pokemon_v2_pokemonabilities {
+            pokemon_v2_ability {
+              name
+            }
+          }
+          pokemon_v2_pokemonsprites {
+            sprites(path: "other.dream_world.front_default")
+          }
+        }
+      }
+    }
+"""

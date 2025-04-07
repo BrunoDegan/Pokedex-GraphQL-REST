@@ -3,19 +3,29 @@ package com.brunodegan.pokedex.data.models
 import com.brunodegan.pokedex.base.network.base.BaseApiData
 import com.google.gson.annotations.SerializedName
 
-data class PokemonGraphQLApiDataModel(
-    @SerializedName("pokemon_v2_pokemon_aggregate") val pokemonAggregate: PokemonAggregate?,
+data class GetAllPokemonsGraphQLResponseData(
+    @SerializedName("pokemon")
+    val pokemon: PokemonNodes?
 ) : BaseApiData()
 
-data class PokemonAggregate(
-    @SerializedName("nodes") val nodes: List<PokemonGraphQLModel>?
+data class PokemonNodes(
+    @SerializedName("nodes")
+    val pokemonNodes: List<PokemonGraphQLModel>?
 ) : BaseApiData()
 
 data class PokemonGraphQLModel(
     @SerializedName("id") val pokemonId: String?,
     @SerializedName("name") val pokemonName: String?,
     @SerializedName("pokemon_v2_pokemontypes") val pokemonTypes: List<PokemonGraphQLTypes>?,
-    @SerializedName("pokemon_v2_pokemonsprites") val pokemonSprites: List<PokemonImages?>,
+    @SerializedName("pokemon_v2_pokemonsprites") val pokemonSprites: List<PokemonImages>?,
+    @SerializedName("pokemon_v2_pokemonabilities") val abilities: List<PokemonAbilities>?,
+) : BaseApiData()
+
+data class PokemonAbilities(@SerializedName("pokemon_v2_ability") val ability: PokemonAbilityName?) :
+    BaseApiData()
+
+data class PokemonAbilityName(
+    @SerializedName("name") val name: String?,
 ) : BaseApiData()
 
 data class PokemonGraphQLTypes(
@@ -27,7 +37,7 @@ data class Type(
 ) : BaseApiData()
 
 data class PokemonImages(
-    @SerializedName("id") val id: String?, @SerializedName("sprites") val spritesUrl: String?
+    @SerializedName("sprites") val spritesUrl: String?
 ) : BaseApiData()
 
 data class Sprites(

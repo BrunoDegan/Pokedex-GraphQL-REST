@@ -76,12 +76,17 @@ fun ErrorUiState(
             )
             Button(
                 contentPadding = PaddingValues(dimensionResource(R.dimen.base_padding)),
-                elevation = ButtonDefaults.elevatedButtonElevation(),
+                elevation = ButtonDefaults.elevatedButtonElevation(
+                    pressedElevation = dimensionResource(
+                        R.dimen.card_elevation
+                    )
+                ),
                 shape = ButtonDefaults.elevatedShape,
                 border = BorderStroke(
                     dimensionResource(R.dimen.tiny_padding), color = colorResource(R.color.teal_700)
                 ),
                 modifier = Modifier
+                    .background(Color.Transparent)
                     .fillMaxWidth()
                     .wrapContentHeight()
                     .padding(

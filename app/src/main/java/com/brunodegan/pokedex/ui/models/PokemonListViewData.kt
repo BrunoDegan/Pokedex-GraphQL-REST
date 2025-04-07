@@ -5,4 +5,5 @@ data class PokemonListViewData(
     val name: String,
     val imgUrl: String,
     val types: List<String>,
+    val abilities: List<String>
 )

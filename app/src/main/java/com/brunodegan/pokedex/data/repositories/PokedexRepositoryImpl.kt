@@ -2,8 +2,8 @@ package com.brunodegan.pokedex.data.repositories
 
 import com.brunodegan.pokedex.base.errors.customErrorHandler
 import com.brunodegan.pokedex.data.datasources.PokemonsDataSource
+import com.brunodegan.pokedex.data.models.GetAllPokemonsGraphQLResponseData
 import com.brunodegan.pokedex.data.models.PokemonDetails
-import com.brunodegan.pokedex.data.models.PokemonGraphQLApiDataModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -16,7 +16,7 @@ class PokedexRepositoryImpl(
     private val remoteDataSource: PokemonsDataSource,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : PokedexRepository {
-    override suspend fun getPokemons(): Flow<Result<PokemonGraphQLApiDataModel>> {
+    override suspend fun getPokemons(): Flow<Result<GetAllPokemonsGraphQLResponseData>> {
         return flow {
             emit(remoteDataSource.getPokemons())
         }.flowOn(dispatcher).customErrorHandler()
