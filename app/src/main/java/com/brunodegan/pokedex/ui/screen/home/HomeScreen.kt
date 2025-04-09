@@ -170,7 +170,7 @@ private fun SuccessState(
         flingBehavior = ScrollableDefaults.flingBehavior(),
         modifier = modifier.fillMaxSize()
     ) {
-        items(viewData.size, key = { index -> viewData[index].name }) { position ->
+        items(viewData.size, key = { index -> viewData[index].id }) { position ->
             PokemonCard(viewData = viewData[position], onCardClicked = onCardClicked)
         }
     }

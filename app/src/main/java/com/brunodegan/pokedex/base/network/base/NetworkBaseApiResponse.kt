@@ -11,3 +11,5 @@ open class BaseApiData : Parcelable
 data class NetworkResponse<T>(
     val data: T,
 )
+
+typealias ApiData = BaseApiData
