@@ -53,7 +53,7 @@ import com.brunodegan.pokedex.base.ui.LoaderUiState
 import com.brunodegan.pokedex.base.ui.SnackbarUiStateHolder
 import com.brunodegan.pokedex.data.metrics.PokedexAnalyticsData.ParamKeys.Companion.SCREEN_NAME
 import com.brunodegan.pokedex.ui.models.PokemonListViewData
-import com.brunodegan.pokedex.ui.screen.home.PokemonListEvents
+import com.brunodegan.pokedex.ui.screen.home.PokemonListUiEvents
 import com.brunodegan.pokedex.ui.screen.home.state.PokemonListUiState
 import com.brunodegan.pokedex.ui.screen.home.viewModel.PokemonListViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -95,7 +95,7 @@ fun HomeScreen(
 @Composable
 private fun HomeScreen(
     state: PokemonListUiState,
-    onEvent: (PokemonListEvents) -> Unit,
+    onEvent: (PokemonListUiEvents) -> Unit,
     onShowSnackbar: (String) -> Unit,
     viewModel: PokemonListViewModel,
     modifier: Modifier,
@@ -114,7 +114,7 @@ private fun HomeScreen(
 @Composable
 private fun HandleUiState(
     state: PokemonListUiState,
-    onEvent: (PokemonListEvents) -> Unit,
+    onEvent: (PokemonListUiEvents) -> Unit,
     modifier: Modifier
 ) {
     val errorMessage = stringResource(R.string.http_response_generic_error_message)
@@ -128,7 +128,7 @@ private fun HandleUiState(
             SuccessState(
                 modifier = modifier, viewData = state.viewData
             ) {
-                onEvent(PokemonListEvents.OnPokemonClicked(it))
+                onEvent(PokemonListUiEvents.OnPokemonClickedUiEvent(it))
             }
         }
 
@@ -137,7 +137,7 @@ private fun HandleUiState(
                 modifier = modifier,
                 errorData = state.error,
             ) {
-                onEvent(PokemonListEvents.OnRetryButtonClicked(errorMessage = errorMessage))
+                onEvent(PokemonListUiEvents.OnRetryButtonClickedUiEvent(errorMessage = errorMessage))
             }
         }
 

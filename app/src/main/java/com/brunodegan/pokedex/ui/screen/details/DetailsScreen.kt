@@ -58,31 +58,34 @@ fun DetailsScreen(
 ) {
     val errorMessage = stringResource(R.string.http_response_generic_error_message)
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     TrackScreen(screenName = ScreenRoutes.DETAILS.name)
 
     BackHandler {
         onNavigateUp()
     }
-    
+
     LaunchedEffect(id) {
         viewModel.getPokemonDetails(id = id, errorMessage = errorMessage)
     }
 
     DetailsScreen(
-        modifier = modifier,
+        id = id,
         onShowSnackbar = onShowSnackbar,
-        onTryAgainButtonClicked = {
-            viewModel.getPokemonDetails(id = id, errorMessage = errorMessage)
+        onEvent = { event ->
+            viewModel.onEvent(event)
         },
         viewModel = viewModel,
-        uiState = uiState
+        uiState = uiState,
+        modifier = modifier
     )
 }
 
 @Composable
 private fun DetailsScreen(
     modifier: Modifier = Modifier,
-    onTryAgainButtonClicked: () -> Unit,
+    id: String?,
+    onEvent: (PokemonDetailsUiEvents) -> Unit,
     onShowSnackbar: (String) -> Unit,
     viewModel: PokemonViewModelDetails,
     uiState: PokemonDetailsUiState
@@ -91,17 +94,20 @@ private fun DetailsScreen(
         onSnackbarEvent = onShowSnackbar, viewModel = viewModel
     )
 
-    HandleUiState(uiState = uiState, modifier = modifier) {
-        onTryAgainButtonClicked()
+    HandleUiState(uiState = uiState, id = id, modifier = modifier) {
+        onEvent(it)
     }
 }
 
 @Composable
 private fun HandleUiState(
+    id: String?,
     uiState: PokemonDetailsUiState,
     modifier: Modifier,
-    onTryAgainButtonClicked: () -> Unit
+    onEvent: (PokemonDetailsUiEvents) -> Unit,
 ) {
+    val errorMessage = stringResource(R.string.http_response_generic_error_message)
+
     when (uiState) {
         is PokemonDetailsUiState.Initial -> {
             TrackScreen(screenName = SCREEN_NAME)
@@ -115,7 +121,14 @@ private fun HandleUiState(
             ErrorUiState(
                 errorData = uiState.error,
             ) {
-                onTryAgainButtonClicked.invoke()
+                id?.let {
+                    onEvent(
+                        PokemonDetailsUiEvents.OnRetryButtonClicked(
+                            id = id,
+                            errorMessage = errorMessage
+                        )
+                    )
+                }
             }
         }
 

@@ -7,6 +7,7 @@ import com.brunodegan.pokedex.base.errors.ErrorData
 import com.brunodegan.pokedex.base.ui.SnackbarUiStateHolder
 import com.brunodegan.pokedex.domain.getPokemonDetailsById.GetPokemonDetailsByIdUseCase
 import com.brunodegan.pokedex.ui.models.PokemonDetailsViewData
+import com.brunodegan.pokedex.ui.screen.details.PokemonDetailsUiEvents
 import com.brunodegan.pokedex.ui.screen.details.PokemonDetailsUiState
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,7 +42,8 @@ class PokemonViewModelDetails(
 
     fun getPokemonDetails(id: String? = null, errorMessage: String) {
         viewModelScope.launch {
-            // Fail fast principle applied
+
+            // Fail fast principle
             if (id.isNullOrEmpty()) {
                 _uiState.update {
                     PokemonDetailsUiState.Error(
@@ -84,6 +86,13 @@ class PokemonViewModelDetails(
         }
     }
 
+    fun onEvent(event: PokemonDetailsUiEvents) {
+        when (event) {
+            is PokemonDetailsUiEvents.OnRetryButtonClicked -> {
+                getPokemonDetails(id = event.id, errorMessage = event.errorMessage)
+            }
+        }
+    }
 
     companion object {
         const val POKEMON_DETAILS_DATA_BUNDLE_KEY = "POKEMON_DETAILS_DATA_BUNDLE_KEY"
