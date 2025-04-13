@@ -5,10 +5,13 @@
 ## ✨ Introduction
 
 Welcome to [Pokedex Playground]! This Android application brings the world of Pokemon to your
-fingertips, allowing you to browse, search, and learn about your favorite creatures. Built with
-modern Android development tools and a passion for Pokemon, this app offers a sleek and intuitive
-Pokedex experience. It's a POC of consuming GraphQL API for Home list screen and Rest driven api for
-detailed pokemon informations
+fingertips, allowing you to browse, search, and learn about your favorite creatures.
+It's a playground project to test and validate new feature on Android Jetpack Compose Development
+Environment.
+Built with modern Android development tools and a passion for Pokemon, this app offers a sleek and
+intuitive
+Pokedex experience. It's a POC of consuming GraphQL API for Home list screen and Rest API for
+detailed pokemon informations.
 
 ## 🚀 Features
 
