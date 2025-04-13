@@ -20,10 +20,5 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
--keepnames class com.brunodegan.pokedex.data.models.PokemonGraphQLApiDataModel
--keepnames class com.brunodegan.pokedex.data.models.PokemonDetails
--keepnames class com.brunodegan.pokedex.data.models.PokemonV2Types
--keepnames class com.brunodegan.pokedex.data.models.Type
--keepnames class com.brunodegan.pokedex.data.models.PokemonImages
--keepnames class com.brunodegan.pokedex.data.models.Types
--keepnames class com.brunodegan.pokedex.data.models.Sprites
+-keepnames class com.brunodegan.pokedex.data.models.*
+-keepnames class com.brunodegan.pokedex.data.api.*
