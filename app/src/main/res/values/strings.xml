@@ -1,8 +1,11 @@
 <resources>
     <string name="app_name">PokeDex</string>
-    <string name="try_again_label">Tentar novamente</string>
-    <string name="http_response_generic_error_message">Erro ao processar sua solicitação! Tente novamente!</string>
+    <string name="try_again_label">Try again</string>
+    <string name="http_response_generic_error_message">Error on processing your request, try again later !</string>
     <string name="snackbar_dismiss_text">Ok</string>
     <string name="pokemon_types_label">Pokemon Types</string>
-    <string name="pokemon_abilities_label">Pokemon Abilities</string>"
+    <string name="pokemon_abilities_label">Pokemon Abilities</string>
+    <string name="measurement_title">Measurements</string>"
+    <string name="pokemon_weight_label">Weight</string>
+    <string name="pokemon_height_label">Height</string>
 </resources>

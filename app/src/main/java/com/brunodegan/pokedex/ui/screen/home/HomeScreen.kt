@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -24,15 +25,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.intl.Locale
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
@@ -58,10 +60,10 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun HomeScreen(
-    modifier: Modifier = Modifier,
     onShowSnackbar: (String) -> Unit,
     onNavigateUp: () -> Unit,
     onCardClicked: (String) -> Unit,
+    modifier: Modifier = Modifier,
     viewModel: PokemonListViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -183,9 +185,13 @@ private fun PokemonCard(
     val cardPadding = dimensionResource(R.dimen.card_padding)
     val LocalCardsPadding = compositionLocalOf { cardPadding }
 
-    val imageRequest = ImageRequest.Builder(LocalContext.current).data(viewData.imgUrl)
+    val imageRequest = ImageRequest.Builder(LocalContext.current)
+        .data(viewData.imgUrl)
         .decoderFactory(SvgDecoder.Factory()).scale(Scale.FIT)
-        .placeholder(R.drawable.placeholder_foreground).error(R.drawable.error_img).build()
+        .crossfade(true)
+        .placeholder(R.drawable.pokeball_icon)
+        .error(R.drawable.error_img)
+        .build()
 
     CompositionLocalProvider(LocalCardsPadding provides cardPadding) {
         Card(
@@ -214,7 +220,7 @@ private fun PokemonCard(
             ) {
                 Column(
                     verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.Start,
+                    horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.padding(LocalCardsPadding.current)
                 ) {
                     Text(
@@ -229,10 +235,12 @@ private fun PokemonCard(
                     )
                     AsyncImage(
                         model = imageRequest,
+                        error = painterResource(R.drawable.error_img),
                         contentDescription = "",
                         modifier = Modifier
                             .padding(all = dimensionResource(R.dimen.double_padding))
                             .size(dimensionResource(R.dimen.pokemon_card_avatar_size))
+                            .clip(RoundedCornerShape(dimensionResource(R.dimen.double_padding)))
                     )
                     Text(
                         fontStyle = FontStyle.Italic,
@@ -279,14 +287,13 @@ private fun PokemonCard(
                     Text(
                         text = viewData.abilities.joinToString().capitalize(Locale.current),
                         color = MaterialTheme.colorScheme.secondary,
-                        fontWeight = FontWeight.W500,
+                        fontWeight = FontWeight.W800,
                         fontSize = TextUnit(
                             value = ResourcesCompat.getFloat(
                                 LocalContext.current.resources, R.dimen.abilities_font_size
                             ), type = TextUnitType.Sp
                         ),
                         overflow = TextOverflow.Clip,
-                        textAlign = TextAlign.Justify,
                         modifier = Modifier.padding(
                             top = dimensionResource(R.dimen.small_padding)
                         )

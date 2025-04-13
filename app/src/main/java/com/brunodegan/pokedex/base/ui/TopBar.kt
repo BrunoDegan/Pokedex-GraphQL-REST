@@ -19,8 +19,7 @@ import androidx.compose.ui.text.style.TextAlign
 @Composable
 fun PokemonAppBar(
     title: String,
-    onBackButtonClicked: (() -> Unit)? = null,
-    actions: @Composable (() -> Unit)? = null,
+    onBackButtonClicked: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior,
     modifier: Modifier = Modifier
 ) {
@@ -33,20 +32,15 @@ fun PokemonAppBar(
             )
         },
         navigationIcon = {
-            onBackButtonClicked?.let {
-                IconButton(onClick = it) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                        contentDescription = "Back",
-                    )
-                }
+            IconButton(onClick = onBackButtonClicked) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                    contentDescription = "Back",
+                )
             }
         },
-        actions = {
-            actions?.invoke()
-        },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            containerColor = MaterialTheme.colorScheme.onSurface,
             titleContentColor = MaterialTheme.colorScheme.secondaryContainer,
         ),
         scrollBehavior = scrollBehavior,

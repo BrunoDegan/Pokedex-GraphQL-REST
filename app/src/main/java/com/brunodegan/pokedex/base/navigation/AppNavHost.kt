@@ -57,9 +57,7 @@ fun AppNavHost() {
                             if (!popped) {
                                 activity?.finish()
                             }
-                        }, actions = {
-                        }
-                    )
+                        })
                 },
             ) { paddingValue ->
                 HomeScreen(
@@ -103,13 +101,9 @@ fun AppNavHost() {
                         title = stringResource(R.string.app_name),
                         onBackButtonClicked = {
                             navController.popBackStack()
-                        }, actions = {
-
-                        }
-                    )
+                        })
                 },
             ) { paddingValue ->
-
                 DetailsScreen(
                     onNavigateUp = {
                         navController.popBackStack()

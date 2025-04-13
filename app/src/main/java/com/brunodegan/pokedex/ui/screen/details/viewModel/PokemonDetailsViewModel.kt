@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.brunodegan.pokedex.base.errors.ErrorData
 import com.brunodegan.pokedex.base.ui.SnackbarUiStateHolder
 import com.brunodegan.pokedex.domain.getPokemonDetailsById.GetPokemonDetailsByIdUseCase
+import com.brunodegan.pokedex.ui.models.PokemonDetailsViewData
 import com.brunodegan.pokedex.ui.screen.details.PokemonDetailsUiState
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,7 +41,6 @@ class PokemonViewModelDetails(
 
     fun getPokemonDetails(id: String? = null, errorMessage: String) {
         viewModelScope.launch {
-
             // Fail fast principle applied
             if (id.isNullOrEmpty()) {
                 _uiState.update {
@@ -54,25 +54,32 @@ class PokemonViewModelDetails(
                 return@launch
             }
 
-            runCatching {
-                getPokemonDetailsByIdUseCase.invoke(id = id)
-                    .onStart {
-                        _uiState.update { PokemonDetailsUiState.Loading }
-                    }.collectLatest { response ->
-                        if (response != null) {
-                            savedStateHandle[POKEMON_DETAILS_DATA_BUNDLE_KEY] = response
-                            _uiState.update { PokemonDetailsUiState.Success(response) }
+            val savedData =
+                savedStateHandle.get<PokemonDetailsViewData>(POKEMON_DETAILS_DATA_BUNDLE_KEY)
+
+            if (savedData == null) {
+                runCatching {
+                    getPokemonDetailsByIdUseCase.invoke(id = id)
+                        .onStart {
+                            _uiState.update { PokemonDetailsUiState.Loading }
+                        }.collectLatest { response ->
+                            if (response != null) {
+                                savedStateHandle[POKEMON_DETAILS_DATA_BUNDLE_KEY] = response
+                                _uiState.update { PokemonDetailsUiState.Success(response) }
+                            }
                         }
-                    }
-            }.getOrElse { _ ->
-                _uiState.update {
-                    PokemonDetailsUiState.Error(
-                        ErrorData(
-                            errorMsg = errorMessage,
+                }.getOrElse { _ ->
+                    _uiState.update {
+                        PokemonDetailsUiState.Error(
+                            ErrorData(
+                                errorMsg = errorMessage,
+                            )
                         )
-                    )
+                    }
+                    _snackbarState.emit(SnackbarUiStateHolder.SnackbarUi(errorMessage))
                 }
-                _snackbarState.emit(SnackbarUiStateHolder.SnackbarUi(errorMessage))
+            } else {
+                _uiState.update { PokemonDetailsUiState.Success(savedData) }
             }
         }
     }
