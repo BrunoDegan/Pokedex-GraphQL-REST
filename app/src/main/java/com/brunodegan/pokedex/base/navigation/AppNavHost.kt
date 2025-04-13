@@ -71,14 +71,17 @@ fun AppNavHost() {
                                 duration = SnackbarDuration.Short
                             )
                         }
-                    }, onNavigateUp = {
+                    },
+                    onNavigateUp = {
                         val popped = navController.popBackStack()
                         if (!popped) {
                             activity?.finish()
                         }
-                    }, onCardClicked = { id ->
+                    },
+                    onCardClicked = { id ->
                         navController.navigate(DetailsRoute(id = id))
-                    }, modifier = Modifier.padding(paddingValue)
+                    },
+                    modifier = Modifier.padding(paddingValue),
                 )
             }
         }

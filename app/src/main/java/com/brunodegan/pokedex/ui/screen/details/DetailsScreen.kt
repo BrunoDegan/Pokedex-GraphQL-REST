@@ -101,8 +101,6 @@ private fun HandleUiState(
         is PokemonDetailsUiState.Loading -> {
             LoaderUiState()
         }
-
-        else -> return
     }
 }
 

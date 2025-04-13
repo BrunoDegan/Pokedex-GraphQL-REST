@@ -19,9 +19,9 @@ class PokemonListViewDataMapper :
                 PokemonListViewData(
                     id = apiData.pokemonId ?: "",
                     name = apiData.pokemonName ?: "",
-                    imgUrl = getImageUrl(apiData.pokemonSprites),
-                    types = getTypes(apiData.pokemonTypes),
-                    abilities = getAbilities(apiData.abilities)
+                    imgUrl = apiData.pokemonSprites.getImageUrl(),
+                    types = apiData.pokemonTypes.getTypes(),
+                    abilities = apiData.abilities.toAbilitiesList()
                 )
             )
         }
@@ -29,24 +29,15 @@ class PokemonListViewDataMapper :
         return pokemonListViewDataList
     }
 
-    private fun getAbilities(apiData: List<PokemonAbilities>?): List<String> {
-        val abilitiesList = mutableListOf<String>()
-        apiData?.forEach { ability ->
-            ability.ability?.name?.let { abilitiesList.add(it) }
-        }
-
-        return abilitiesList
+    private fun List<PokemonAbilities>?.toAbilitiesList(): List<String> {
+        return this?.mapNotNull { it.ability?.name } ?: emptyList()
     }
 
-    private fun getTypes(apiData: List<PokemonGraphQLTypes>?): List<String> {
-        val typesList = mutableListOf<String>()
-        apiData?.forEach { type ->
-            type.type.name?.let { typesList.add(it) }
-        }
-        return typesList
+    private fun List<PokemonGraphQLTypes>?.getTypes(): List<String> {
+        return this?.mapNotNull { it.type.name } ?: emptyList()
     }
 
-    private fun getImageUrl(apiData: List<PokemonImages>?): String {
-        return apiData?.firstOrNull()?.spritesUrl ?: ""
+    private fun List<PokemonImages>?.getImageUrl(): String {
+        return this?.firstOrNull()?.spritesUrl ?: ""
     }
 }

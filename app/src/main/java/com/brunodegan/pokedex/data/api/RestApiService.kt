@@ -1,17 +1,17 @@
 package com.brunodegan.pokedex.data.api
 
 import com.brunodegan.pokedex.base.network.base.NetworkResponse
-import com.brunodegan.pokedex.data.models.PokemonDetails
+import com.brunodegan.pokedex.data.models.PokemonDetailsRestApiModel
 import retrofit2.http.GET
 import retrofit2.http.Path
 
 interface RestApiService {
 
     @GET(POKEMON_DETAIL_BY_ID)
-    suspend fun getPokemonDetailsById(@Path(ID) id: String): NetworkResponse<PokemonDetails>
+    suspend fun getPokemonDetailsById(@Path(ID) id: String): NetworkResponse<PokemonDetailsRestApiModel>
 
     @GET(POKEMON_DETAIL_BY_NAME)
-    suspend fun getPokemonDetailsByName(@Path(NAME) name: String): NetworkResponse<PokemonDetails>
+    suspend fun getPokemonDetailsByName(@Path(NAME) name: String): NetworkResponse<PokemonDetailsRestApiModel>
 
     companion object {
         const val ID = "{id}"

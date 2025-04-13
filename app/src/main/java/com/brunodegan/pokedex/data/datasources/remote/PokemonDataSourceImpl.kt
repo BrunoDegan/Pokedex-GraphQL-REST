@@ -5,7 +5,7 @@ import com.brunodegan.pokedex.data.api.GraphQLApiService
 import com.brunodegan.pokedex.data.api.RestApiService
 import com.brunodegan.pokedex.data.datasources.PokemonsDataSource
 import com.brunodegan.pokedex.data.models.GetAllPokemonsGraphQLResponseData
-import com.brunodegan.pokedex.data.models.PokemonDetails
+import com.brunodegan.pokedex.data.models.PokemonDetailsRestApiModel
 import org.koin.core.annotation.Single
 
 @Single
@@ -18,11 +18,11 @@ class PokemonsRemoteDataSourceImpl(
         return graphQlApi.getAllPokemons(GetAllPokemonsGraphQLRequestData()).data
     }
 
-    override suspend fun getPokemonById(id: String): PokemonDetails {
+    override suspend fun getPokemonById(id: String): PokemonDetailsRestApiModel {
         return restApi.getPokemonDetailsById(id).data
     }
 
-    override suspend fun getPokemonByName(name: String): PokemonDetails {
+    override suspend fun getPokemonByName(name: String): PokemonDetailsRestApiModel {
         return restApi.getPokemonDetailsByName(name).data
     }
 }

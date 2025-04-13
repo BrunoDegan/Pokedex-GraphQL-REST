@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.brunodegan.pokedex.base.errors.ErrorData
 import com.brunodegan.pokedex.base.ui.SnackbarUiStateHolder
 import com.brunodegan.pokedex.domain.getPokemonsUseCase.GetPokemonsDataUseCase
+import com.brunodegan.pokedex.ui.screen.home.PokemonListEvents
 import com.brunodegan.pokedex.ui.screen.home.state.PokemonListUiState
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,6 +38,20 @@ class PokemonListViewModel(
         started = SharingStarted.WhileSubscribed(5_000),
         initialValue = PokemonListUiState.Initial,
     )
+
+    fun onEvent(event: PokemonListEvents, onCardClicked: (String) -> Unit) {
+        when (event) {
+            is PokemonListEvents.OnRetryButtonClicked -> {
+                val errorMessage = event.errorMessage
+                getPokemons(errorMessage)
+            }
+
+            is PokemonListEvents.OnPokemonClicked -> {
+                val pokemonId = event.pokemonId
+                onCardClicked(pokemonId)
+            }
+        }
+    }
 
     fun getPokemons(errorMessage: String) {
         viewModelScope.launch {

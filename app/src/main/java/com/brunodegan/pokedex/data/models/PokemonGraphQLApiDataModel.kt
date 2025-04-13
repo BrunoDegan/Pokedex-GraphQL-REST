@@ -43,12 +43,3 @@ data class PokemonImages(
 data class Sprites(
     @SerializedName("front_default") val frontDefault: String?
 ) : ApiData()
-
-data class PokemonDetails(
-    @SerializedName("id") val id: String?,
-    @SerializedName("name") val name: String?,
-    @SerializedName("height") val height: String?,
-    @SerializedName("weight") val weight: String?,
-    @SerializedName("types") val types: List<Type>?,
-    @SerializedName("sprites") val sprites: List<Sprites>?
-) : ApiData()

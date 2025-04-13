@@ -49,12 +49,12 @@ import com.brunodegan.pokedex.base.routes.ScreenRoutes
 import com.brunodegan.pokedex.base.ui.ErrorUiState
 import com.brunodegan.pokedex.base.ui.LoaderUiState
 import com.brunodegan.pokedex.base.ui.SnackbarUiStateHolder
+import com.brunodegan.pokedex.data.metrics.PokedexAnalyticsData.ParamKeys.Companion.SCREEN_NAME
 import com.brunodegan.pokedex.ui.models.PokemonListViewData
+import com.brunodegan.pokedex.ui.screen.home.PokemonListEvents
 import com.brunodegan.pokedex.ui.screen.home.state.PokemonListUiState
 import com.brunodegan.pokedex.ui.screen.home.viewModel.PokemonListViewModel
 import org.koin.androidx.compose.koinViewModel
-
-private const val SCREEN_NAME = "Home"
 
 @Composable
 fun HomeScreen(
@@ -77,11 +77,13 @@ fun HomeScreen(
     }
     HomeScreen(
         onShowSnackbar = onShowSnackbar,
-        uiState = uiState,
+        state = uiState,
         viewModel = viewModel,
-        onCardClicked = onCardClicked,
-        onRetryButtonClicked = {
-            viewModel.getPokemons(errorMessage = errorMessage)
+        onEvent = {
+            viewModel.onEvent(
+                event = it,
+                onCardClicked = onCardClicked
+            )
         },
         modifier = modifier
     )
@@ -89,10 +91,9 @@ fun HomeScreen(
 
 
 @Composable
-internal fun HomeScreen(
-    uiState: PokemonListUiState,
-    onCardClicked: (String) -> Unit,
-    onRetryButtonClicked: () -> Unit,
+private fun HomeScreen(
+    state: PokemonListUiState,
+    onEvent: (PokemonListEvents) -> Unit,
     onShowSnackbar: (String) -> Unit,
     viewModel: PokemonListViewModel,
     modifier: Modifier,
@@ -100,47 +101,46 @@ internal fun HomeScreen(
     SnackbarUiState(
         onSnackbarEvent = onShowSnackbar, viewModel = viewModel
     )
+
     HandleUiState(
-        uiState = uiState,
-        onRetryButtonClicked = onRetryButtonClicked,
-        onCardClicked = onCardClicked,
+        state = state,
+        onEvent = onEvent,
         modifier = modifier
     )
 }
 
 @Composable
 private fun HandleUiState(
-    uiState: PokemonListUiState,
-    onCardClicked: (String) -> Unit,
-    onRetryButtonClicked: () -> Unit,
+    state: PokemonListUiState,
+    onEvent: (PokemonListEvents) -> Unit,
     modifier: Modifier
 ) {
-    when (uiState) {
+    val errorMessage = stringResource(R.string.http_response_generic_error_message)
+
+    when (state) {
         is PokemonListUiState.Initial -> {
             TrackScreen(screenName = SCREEN_NAME)
         }
 
         is PokemonListUiState.Success -> {
             SuccessState(
-                modifier = modifier, viewData = uiState.viewData, onCardClicked = onCardClicked
-            )
+                modifier = modifier, viewData = state.viewData
+            ) {
+                onEvent(PokemonListEvents.OnPokemonClicked(it))
+            }
         }
 
         is PokemonListUiState.Error -> {
             ErrorUiState(
                 modifier = modifier,
-                errorData = uiState.error,
+                errorData = state.error,
             ) {
-                onRetryButtonClicked()
+                onEvent(PokemonListEvents.OnRetryButtonClicked(errorMessage = errorMessage))
             }
         }
 
         is PokemonListUiState.Loading -> {
             LoaderUiState()
-        }
-
-        else -> {
-
         }
     }
 }
@@ -161,8 +161,8 @@ fun SnackbarUiState(
 @Composable
 private fun SuccessState(
     modifier: Modifier = Modifier,
-    onCardClicked: (String) -> Unit,
-    viewData: List<PokemonListViewData>
+    viewData: List<PokemonListViewData>,
+    onCardClicked: (String) -> Unit
 ) {
     LazyColumn(
         verticalArrangement = Arrangement.Center,
@@ -301,9 +301,8 @@ private fun PokemonCard(
 @Composable
 fun HomeScreenPreview() {
     HomeScreen(
-        uiState = PokemonListUiState.Initial,
-        onCardClicked = {},
-        onRetryButtonClicked = {},
+        state = PokemonListUiState.Initial,
+        onEvent = {},
         onShowSnackbar = {},
         viewModel = TODO(),
         modifier = TODO(),

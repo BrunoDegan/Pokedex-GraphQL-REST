@@ -3,7 +3,7 @@ package com.brunodegan.pokedex.data.repositories
 import com.brunodegan.pokedex.base.errors.customErrorHandler
 import com.brunodegan.pokedex.data.datasources.PokemonsDataSource
 import com.brunodegan.pokedex.data.models.GetAllPokemonsGraphQLResponseData
-import com.brunodegan.pokedex.data.models.PokemonDetails
+import com.brunodegan.pokedex.data.models.PokemonDetailsRestApiModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -22,13 +22,13 @@ class PokedexRepositoryImpl(
         }.flowOn(dispatcher).customErrorHandler()
     }
 
-    override suspend fun getPokemonById(id: String): Flow<Result<PokemonDetails>> {
+    override suspend fun getPokemonById(id: String): Flow<Result<PokemonDetailsRestApiModel>> {
         return flow {
             emit(remoteDataSource.getPokemonById(id = id))
         }.flowOn(dispatcher).customErrorHandler()
     }
 
-    override suspend fun getPokemonByName(name: String): Flow<Result<PokemonDetails>> {
+    override suspend fun getPokemonByName(name: String): Flow<Result<PokemonDetailsRestApiModel>> {
         return flow {
             emit(remoteDataSource.getPokemonByName(name = name))
         }.flowOn(dispatcher).customErrorHandler()

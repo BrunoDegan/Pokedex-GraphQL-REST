@@ -7,4 +7,6 @@ data class PokemonDetailsViewData(
     val weight: String,
     val imgUrl: String,
     val types: List<String>,
+    val species: String,
+    val stats: List<Pair<String, String>>
 )

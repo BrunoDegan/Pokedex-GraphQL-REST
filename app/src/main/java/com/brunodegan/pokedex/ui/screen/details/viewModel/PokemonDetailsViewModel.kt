@@ -77,6 +77,7 @@ class PokemonViewModelDetails(
         }
     }
 
+
     companion object {
         const val POKEMON_DETAILS_DATA_BUNDLE_KEY = "POKEMON_DETAILS_DATA_BUNDLE_KEY"
     }

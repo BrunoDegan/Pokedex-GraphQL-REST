@@ -19,7 +19,6 @@ import com.brunodegan.pokedex.data.metrics.MyMoneyConversorMetrics
 import com.brunodegan.pokedex.data.metrics.onEnteredScreen
 import com.brunodegan.pokedex.ui.theme.PokedexTheme
 
-
 @Composable
 fun TrackScreen(
     screenName: String,
