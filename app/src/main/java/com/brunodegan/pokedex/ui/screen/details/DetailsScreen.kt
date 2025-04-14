@@ -57,9 +57,7 @@ fun DetailsScreen(
 ) {
     val errorMessage = stringResource(R.string.http_response_generic_error_message)
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-    TrackScreen(screenName = SCREEN_NAME)
-
+    
     BackHandler {
         onNavigateUp()
     }

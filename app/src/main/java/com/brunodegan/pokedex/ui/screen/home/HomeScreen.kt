@@ -46,7 +46,6 @@ import coil.decode.SvgDecoder
 import coil.request.ImageRequest
 import coil.size.Scale
 import com.brunodegan.pokedex.R
-import com.brunodegan.pokedex.base.routes.ScreenRoutes
 import com.brunodegan.pokedex.base.ui.ErrorUiState
 import com.brunodegan.pokedex.base.ui.LoaderUiState
 import com.brunodegan.pokedex.base.ui.SnackbarUiStateHolder
@@ -69,7 +68,6 @@ fun HomeScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val errorMessage = stringResource(R.string.http_response_generic_error_message)
-    TrackScreen(screenName = SCREEN_NAME)
 
     BackHandler {
         onNavigateUp()
@@ -122,7 +120,7 @@ private fun HandleUiState(
 
     when (state) {
         is PokemonListUiState.Initial -> {
-            TrackScreen(screenName = )
+            TrackScreen(screenName = SCREEN_NAME)
         }
 
         is PokemonListUiState.Success -> {
