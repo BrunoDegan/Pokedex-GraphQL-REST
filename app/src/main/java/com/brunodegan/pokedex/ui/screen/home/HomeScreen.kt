@@ -46,17 +46,18 @@ import coil.decode.SvgDecoder
 import coil.request.ImageRequest
 import coil.size.Scale
 import com.brunodegan.pokedex.R
-import com.brunodegan.pokedex.base.TrackScreen
 import com.brunodegan.pokedex.base.routes.ScreenRoutes
 import com.brunodegan.pokedex.base.ui.ErrorUiState
 import com.brunodegan.pokedex.base.ui.LoaderUiState
 import com.brunodegan.pokedex.base.ui.SnackbarUiStateHolder
-import com.brunodegan.pokedex.data.metrics.PokedexAnalyticsData.ParamKeys.Companion.SCREEN_NAME
+import com.brunodegan.pokedex.data.metrics.TrackScreen
 import com.brunodegan.pokedex.ui.models.PokemonListViewData
 import com.brunodegan.pokedex.ui.screen.home.PokemonListUiEvents
 import com.brunodegan.pokedex.ui.screen.home.state.PokemonListUiState
 import com.brunodegan.pokedex.ui.screen.home.viewModel.PokemonListViewModel
 import org.koin.androidx.compose.koinViewModel
+
+private const val SCREEN_NAME = "Home"
 
 @Composable
 fun HomeScreen(
@@ -68,7 +69,7 @@ fun HomeScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val errorMessage = stringResource(R.string.http_response_generic_error_message)
-    TrackScreen(screenName = ScreenRoutes.HOME.name)
+    TrackScreen(screenName = SCREEN_NAME)
 
     BackHandler {
         onNavigateUp()
@@ -121,7 +122,7 @@ private fun HandleUiState(
 
     when (state) {
         is PokemonListUiState.Initial -> {
-            TrackScreen(screenName = SCREEN_NAME)
+            TrackScreen(screenName = )
         }
 
         is PokemonListUiState.Success -> {

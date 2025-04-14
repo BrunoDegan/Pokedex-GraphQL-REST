@@ -37,11 +37,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.brunodegan.pokedex.R
-import com.brunodegan.pokedex.base.TrackScreen
-import com.brunodegan.pokedex.base.routes.ScreenRoutes
 import com.brunodegan.pokedex.base.ui.ErrorUiState
 import com.brunodegan.pokedex.base.ui.LoaderUiState
 import com.brunodegan.pokedex.base.ui.SnackbarUiStateHolder
+import com.brunodegan.pokedex.data.metrics.TrackScreen
 import com.brunodegan.pokedex.ui.models.PokemonDetailsViewData
 import com.brunodegan.pokedex.ui.screen.details.viewModel.PokemonViewModelDetails
 import org.koin.androidx.compose.koinViewModel
@@ -59,7 +58,7 @@ fun DetailsScreen(
     val errorMessage = stringResource(R.string.http_response_generic_error_message)
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    TrackScreen(screenName = ScreenRoutes.DETAILS.name)
+    TrackScreen(screenName = SCREEN_NAME)
 
     BackHandler {
         onNavigateUp()
@@ -70,14 +69,9 @@ fun DetailsScreen(
     }
 
     DetailsScreen(
-        id = id,
-        onShowSnackbar = onShowSnackbar,
-        onEvent = { event ->
+        id = id, onShowSnackbar = onShowSnackbar, onEvent = { event ->
             viewModel.onEvent(event)
-        },
-        viewModel = viewModel,
-        uiState = uiState,
-        modifier = modifier
+        }, viewModel = viewModel, uiState = uiState, modifier = modifier
     )
 }
 
@@ -124,8 +118,7 @@ private fun HandleUiState(
                 id?.let {
                     onEvent(
                         PokemonDetailsUiEvents.OnRetryButtonClicked(
-                            id = id,
-                            errorMessage = errorMessage
+                            id = id, errorMessage = errorMessage
                         )
                     )
                 }
@@ -140,8 +133,7 @@ private fun HandleUiState(
 
 @Composable
 fun SnackbarUiState(
-    viewModel: PokemonViewModelDetails,
-    onSnackbarEvent: (String) -> Unit
+    viewModel: PokemonViewModelDetails, onSnackbarEvent: (String) -> Unit
 ) {
     val snackbarState by viewModel.snackbarState.collectAsStateWithLifecycle()
 
@@ -154,15 +146,13 @@ fun SnackbarUiState(
 
 @Composable
 private fun SuccessState(
-    modifier: Modifier = Modifier,
-    viewData: PokemonDetailsViewData
+    modifier: Modifier = Modifier, viewData: PokemonDetailsViewData
 ) {
     Card(
         shape = RectangleShape,
         elevation = CardDefaults.cardElevation(dimensionResource(R.dimen.card_elevation)),
         border = BorderStroke(
-            dimensionResource(R.dimen.card_border_elevation),
-            Color.LightGray
+            dimensionResource(R.dimen.card_border_elevation), Color.LightGray
         ),
         modifier = modifier
             .fillMaxWidth()
@@ -181,10 +171,8 @@ private fun SuccessState(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     AsyncImage(
-                        model = ImageRequest.Builder(LocalContext.current)
-                            .data(viewData.imgUrl)
-                            .crossfade(true)
-                            .build(),
+                        model = ImageRequest.Builder(LocalContext.current).data(viewData.imgUrl)
+                            .crossfade(true).build(),
                         placeholder = painterResource(R.drawable.pokeball_icon),
                         error = painterResource(R.drawable.error_img),
                         contentDescription = "Image of ${viewData.name}",
@@ -231,12 +219,10 @@ private fun SuccessState(
                     horizontalArrangement = Arrangement.SpaceAround
                 ) {
                     MeasurementItem(
-                        stringResource(R.string.pokemon_weight_label),
-                        "${viewData.weight} kg"
+                        stringResource(R.string.pokemon_weight_label), "${viewData.weight} kg"
                     )
                     MeasurementItem(
-                        stringResource(R.string.pokemon_weight_label),
-                        "${viewData.height} m"
+                        stringResource(R.string.pokemon_weight_label), "${viewData.height} m"
                     )
                 }
             }

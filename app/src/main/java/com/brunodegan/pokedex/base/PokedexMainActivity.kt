@@ -10,23 +10,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.brunodegan.pokedex.base.navigation.AppNavHost
 import com.brunodegan.pokedex.data.metrics.LocalMetrics
-import com.brunodegan.pokedex.data.metrics.MyMoneyConversorMetrics
-import com.brunodegan.pokedex.data.metrics.onEnteredScreen
 import com.brunodegan.pokedex.ui.theme.PokedexTheme
-
-@Composable
-fun TrackScreen(
-    screenName: String,
-    analyticsHelper: MyMoneyConversorMetrics = LocalMetrics.current,
-) = DisposableEffect(Unit) {
-    analyticsHelper.onEnteredScreen(screenName = screenName)
-    onDispose {}
-}
 
 class PokeDexMainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
