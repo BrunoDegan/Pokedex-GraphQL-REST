@@ -3,7 +3,7 @@ package com.brunodegan.pokedex.base.network
 import com.brunodegan.pokedex.data.api.GraphQLApiService
 import com.brunodegan.pokedex.data.api.GraphQLApiService.Companion.GRAPHQL_BASE_URL
 import com.brunodegan.pokedex.data.api.RestApiService
-import com.brunodegan.pokedex.data.api.RestApiService.Companion.BASE_URL
+import com.brunodegan.pokedex.data.api.RestApiService.Companion.REST_API_BASE_URL
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.core.annotation.ComponentScan
@@ -22,7 +22,7 @@ class NetworkModule {
     @Single
     fun getRestApiClient(): RestApiService {
         return Retrofit.Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl(REST_API_BASE_URL)
             .client(provideHttpClient())
             .addConverterFactory(provideConverterFactory())
             .build()

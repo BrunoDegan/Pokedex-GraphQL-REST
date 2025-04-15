@@ -4,6 +4,7 @@ import HomeScreen
 import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarDuration
@@ -27,6 +28,7 @@ import com.brunodegan.pokedex.base.ui.BaseScreen
 import com.brunodegan.pokedex.base.ui.PokemonAppBar
 import com.brunodegan.pokedex.ui.screen.details.DetailsScreen
 import kotlinx.coroutines.launch
+import org.koin.compose.KoinContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,90 +37,99 @@ fun AppNavHost() {
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
     val activity = LocalView.current.context as? Activity
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
-    NavHost(navController, startDestination = HomeRoute) {
-        composable<HomeRoute> { navBackStackEntry ->
-            navBackStackEntry.id
-            BaseScreen(
-                snackbarHostState = snackbarHostState,
-                snackbar = {
-                    SnackbarHost(
-                        hostState = snackbarHostState,
-                        modifier = Modifier.background(color = MaterialTheme.colorScheme.onError)
-                    )
-                },
-                topBar = {
-                    PokemonAppBar(
+    KoinContext {
+        NavHost(navController, startDestination = HomeRoute) {
+            composable<HomeRoute> { navBackStackEntry ->
+                navBackStackEntry.id
+                BaseScreen(
+                    snackbarHostState = snackbarHostState,
+                    snackbar = {
+                        SnackbarHost(
+                            hostState = snackbarHostState,
+                            modifier = Modifier
+                                .background(color = MaterialTheme.colorScheme.onError)
+                                .safeContentPadding()
+                        )
+                    },
+                    topBar = {
+                        PokemonAppBar(
+                            scrollBehavior = scrollBehavior,
+                            title = stringResource(R.string.app_name),
+                            onBackButtonClicked = {
+                                val popped = navController.popBackStack()
+                                if (!popped) {
+                                    activity?.finish()
+                                }
+                            })
+                    },
+                ) { paddingValue ->
+                    HomeScreen(
                         scrollBehavior = scrollBehavior,
-                        title = stringResource(R.string.app_name),
-                        onBackButtonClicked = {
+                        onShowSnackbar = { msg ->
+                            coroutineScope.launch {
+                                snackbarHostState.showSnackbar(
+                                    message = msg,
+                                    withDismissAction = true,
+                                    duration = SnackbarDuration.Short
+                                )
+                            }
+                        },
+                        onNavigateUp = {
                             val popped = navController.popBackStack()
                             if (!popped) {
                                 activity?.finish()
                             }
-                        })
-                },
-            ) { paddingValue ->
-                HomeScreen(
-                    onShowSnackbar = { msg ->
-                        coroutineScope.launch {
-                            snackbarHostState.showSnackbar(
-                                message = msg,
-                                withDismissAction = true,
-                                duration = SnackbarDuration.Short
-                            )
-                        }
-                    },
-                    onNavigateUp = {
-                        val popped = navController.popBackStack()
-                        if (!popped) {
-                            activity?.finish()
-                        }
-                    },
-                    onCardClicked = { id ->
-                        navController.navigate(DetailsRoute(id = id))
-                    },
-                    modifier = Modifier.padding(paddingValue),
-                )
-            }
-        }
-        composable<DetailsRoute> { navBackStackEntry ->
-
-            val detailsRouteArgs = navBackStackEntry.toRoute<DetailsRoute>()
-
-            BaseScreen(
-                snackbarHostState = snackbarHostState,
-                snackbar = {
-                    SnackbarHost(
-                        hostState = snackbarHostState,
-                        modifier = Modifier.background(color = MaterialTheme.colorScheme.onError)
+                        },
+                        onCardClicked = { id ->
+                            navController.navigate(DetailsRoute(id = id))
+                        },
+                        modifier = Modifier.padding(paddingValue),
                     )
-                },
-                topBar = {
-                    PokemonAppBar(
+                }
+            }
+            composable<DetailsRoute> { navBackStackEntry ->
+
+                val detailsRouteArgs = navBackStackEntry.toRoute<DetailsRoute>()
+
+                BaseScreen(
+                    snackbarHostState = snackbarHostState,
+                    snackbar = {
+                        SnackbarHost(
+                            hostState = snackbarHostState,
+                            modifier = Modifier
+                                .background(color = MaterialTheme.colorScheme.onError)
+                                .safeContentPadding()
+                        )
+                    },
+                    topBar = {
+                        PokemonAppBar(
+                            scrollBehavior = scrollBehavior,
+                            title = stringResource(R.string.app_name),
+                            onBackButtonClicked = {
+                                navController.popBackStack()
+                            })
+                    },
+                ) { paddingValue ->
+                    DetailsScreen(
                         scrollBehavior = scrollBehavior,
-                        title = stringResource(R.string.app_name),
-                        onBackButtonClicked = {
+                        onNavigateUp = {
                             navController.popBackStack()
-                        })
-                },
-            ) { paddingValue ->
-                DetailsScreen(
-                    onNavigateUp = {
-                        navController.popBackStack()
-                    },
-                    onShowSnackbar = { msg ->
-                        coroutineScope.launch {
-                            snackbarHostState.showSnackbar(
-                                message = msg
-                            )
-                        }
-                    },
-                    id = detailsRouteArgs.id,
-                    modifier = Modifier.padding(paddingValue),
-                )
+                        },
+                        onShowSnackbar = { msg ->
+                            coroutineScope.launch {
+                                snackbarHostState.showSnackbar(
+                                    message = msg
+                                )
+                            }
+                        },
+                        id = detailsRouteArgs.id,
+                        modifier = Modifier.padding(paddingValue),
+                    )
+                }
             }
         }
+
     }
 }

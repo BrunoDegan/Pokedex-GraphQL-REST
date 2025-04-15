@@ -40,11 +40,11 @@ class PokemonViewModelDetails(
         initialValue = PokemonDetailsUiState.Initial,
     )
 
-    fun getPokemonDetails(id: String? = null, errorMessage: String) {
+    fun getPokemonDetails(id: Int? = null, errorMessage: String) {
         viewModelScope.launch {
 
             // Fail fast principle
-            if (id.isNullOrEmpty()) {
+            if (id == null) {
                 _uiState.update {
                     PokemonDetailsUiState.Error(
                         ErrorData(

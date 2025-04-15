@@ -15,8 +15,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -27,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -58,11 +62,13 @@ import org.koin.androidx.compose.koinViewModel
 
 private const val SCREEN_NAME = "Home"
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
+    scrollBehavior: TopAppBarScrollBehavior,
     onShowSnackbar: (String) -> Unit,
     onNavigateUp: () -> Unit,
-    onCardClicked: (String) -> Unit,
+    onCardClicked: (Int) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PokemonListViewModel = koinViewModel()
 ) {
@@ -77,6 +83,7 @@ fun HomeScreen(
         viewModel.getPokemons(errorMessage = errorMessage)
     }
     HomeScreen(
+        scrollBehavior = scrollBehavior,
         onShowSnackbar = onShowSnackbar,
         state = uiState,
         viewModel = viewModel,
@@ -91,8 +98,10 @@ fun HomeScreen(
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HomeScreen(
+    scrollBehavior: TopAppBarScrollBehavior,
     state: PokemonListUiState,
     onEvent: (PokemonListUiEvents) -> Unit,
     onShowSnackbar: (String) -> Unit,
@@ -104,14 +113,17 @@ private fun HomeScreen(
     )
 
     HandleUiState(
+        scrollBehavior = scrollBehavior,
         state = state,
         onEvent = onEvent,
         modifier = modifier
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HandleUiState(
+    scrollBehavior: TopAppBarScrollBehavior,
     state: PokemonListUiState,
     onEvent: (PokemonListUiEvents) -> Unit,
     modifier: Modifier
@@ -125,7 +137,9 @@ private fun HandleUiState(
 
         is PokemonListUiState.Success -> {
             SuccessState(
-                modifier = modifier, viewData = state.viewData
+                scrollBehavior = scrollBehavior,
+                modifier = modifier,
+                viewData = state.viewData
             ) {
                 onEvent(PokemonListUiEvents.OnPokemonClickedUiEvent(it))
             }
@@ -159,17 +173,21 @@ fun SnackbarUiState(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SuccessState(
+    scrollBehavior: TopAppBarScrollBehavior,
     modifier: Modifier = Modifier,
     viewData: List<PokemonListViewData>,
-    onCardClicked: (String) -> Unit
+    onCardClicked: (Int) -> Unit
 ) {
     LazyColumn(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
         flingBehavior = ScrollableDefaults.flingBehavior(),
-        modifier = modifier.fillMaxSize()
+        modifier = modifier
+            .nestedScroll(scrollBehavior.nestedScrollConnection)
+            .fillMaxSize()
     ) {
         items(viewData.size, key = { index -> viewData[index].id }) { position ->
             PokemonCard(viewData = viewData[position], onCardClicked = onCardClicked)
@@ -179,7 +197,7 @@ private fun SuccessState(
 
 @Composable
 private fun PokemonCard(
-    modifier: Modifier = Modifier, onCardClicked: (String) -> Unit, viewData: PokemonListViewData
+    modifier: Modifier = Modifier, onCardClicked: (Int) -> Unit, viewData: PokemonListViewData
 ) {
     val cardPadding = dimensionResource(R.dimen.card_padding)
     val LocalCardsPadding = compositionLocalOf { cardPadding }
@@ -303,10 +321,12 @@ private fun PokemonCard(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
 fun HomeScreenPreview() {
     HomeScreen(
+        scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(),
         state = PokemonListUiState.Initial,
         onEvent = {},
         onShowSnackbar = {},

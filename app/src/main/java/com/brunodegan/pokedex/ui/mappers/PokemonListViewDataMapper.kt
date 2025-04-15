@@ -17,7 +17,7 @@ class PokemonListViewDataMapper :
         input?.pokemon?.pokemonNodes?.forEach { apiData ->
             pokemonListViewDataList.add(
                 PokemonListViewData(
-                    id = apiData.pokemonId ?: "",
+                    id = apiData.pokemonId.toId(),
                     name = apiData.pokemonName ?: "",
                     imgUrl = apiData.pokemonSprites.getImageUrl(),
                     types = apiData.pokemonTypes.getTypes(),
@@ -27,6 +27,10 @@ class PokemonListViewDataMapper :
         }
 
         return pokemonListViewDataList
+    }
+
+    private fun String?.toId(): Int {
+        return this?.toIntOrNull() ?: 0
     }
 
     private fun List<PokemonAbilities>?.toAbilitiesList(): List<String> {

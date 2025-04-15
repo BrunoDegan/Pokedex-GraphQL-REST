@@ -14,9 +14,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -25,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
@@ -32,7 +35,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -47,9 +49,11 @@ import org.koin.androidx.compose.koinViewModel
 
 private const val SCREEN_NAME = "Details"
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailsScreen(
-    id: String?,
+    id: Int? = null,
+    scrollBehavior: TopAppBarScrollBehavior,
     modifier: Modifier = Modifier,
     onShowSnackbar: (String) -> Unit,
     onNavigateUp: () -> Unit,
@@ -57,7 +61,7 @@ fun DetailsScreen(
 ) {
     val errorMessage = stringResource(R.string.http_response_generic_error_message)
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    
+
     BackHandler {
         onNavigateUp()
     }
@@ -67,33 +71,48 @@ fun DetailsScreen(
     }
 
     DetailsScreen(
-        id = id, onShowSnackbar = onShowSnackbar, onEvent = { event ->
+        id = id,
+        scrollBehavior = scrollBehavior,
+        onShowSnackbar = onShowSnackbar,
+        onEvent = { event ->
             viewModel.onEvent(event)
-        }, viewModel = viewModel, uiState = uiState, modifier = modifier
+        },
+        viewModel = viewModel,
+        uiState = uiState,
+        modifier = modifier
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DetailsScreen(
-    modifier: Modifier = Modifier,
-    id: String?,
+    id: Int?,
+    scrollBehavior: TopAppBarScrollBehavior,
     onEvent: (PokemonDetailsUiEvents) -> Unit,
     onShowSnackbar: (String) -> Unit,
     viewModel: PokemonViewModelDetails,
+    modifier: Modifier = Modifier,
     uiState: PokemonDetailsUiState
 ) {
     SnackbarUiState(
         onSnackbarEvent = onShowSnackbar, viewModel = viewModel
     )
 
-    HandleUiState(uiState = uiState, id = id, modifier = modifier) {
+    HandleUiState(
+        scrollBehavior = scrollBehavior,
+        uiState = uiState,
+        id = id,
+        modifier = modifier
+    ) {
         onEvent(it)
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HandleUiState(
-    id: String?,
+    id: Int?,
+    scrollBehavior: TopAppBarScrollBehavior,
     uiState: PokemonDetailsUiState,
     modifier: Modifier,
     onEvent: (PokemonDetailsUiEvents) -> Unit,
@@ -106,7 +125,11 @@ private fun HandleUiState(
         }
 
         is PokemonDetailsUiState.Success -> {
-            SuccessState(modifier = modifier, viewData = uiState.viewData)
+            SuccessState(
+                scrollBehavior = scrollBehavior,
+                modifier = modifier,
+                viewData = uiState.viewData
+            )
         }
 
         is PokemonDetailsUiState.Error -> {
@@ -142,9 +165,12 @@ fun SnackbarUiState(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SuccessState(
-    modifier: Modifier = Modifier, viewData: PokemonDetailsViewData
+    modifier: Modifier = Modifier,
+    scrollBehavior: TopAppBarScrollBehavior,
+    viewData: PokemonDetailsViewData
 ) {
     Card(
         shape = RectangleShape,
@@ -160,6 +186,7 @@ private fun SuccessState(
         LazyColumn(
             modifier = modifier
                 .fillMaxSize()
+                .nestedScroll(scrollBehavior.nestedScrollConnection)
                 .padding(dimensionResource(R.dimen.double_padding))
         ) {
             item {
@@ -176,7 +203,7 @@ private fun SuccessState(
                         contentDescription = "Image of ${viewData.name}",
                         contentScale = ContentScale.Fit,
                         modifier = Modifier
-                            .size(150.dp)
+                            .size(dimensionResource(R.dimen.details_image_size))
                             .clip(RoundedCornerShape(dimensionResource(R.dimen.double_padding)))
                     )
                     Column {

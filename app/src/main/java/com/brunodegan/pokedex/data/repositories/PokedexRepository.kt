@@ -6,6 +6,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface PokedexRepository {
     suspend fun getPokemons(): Flow<Result<GetAllPokemonsGraphQLResponseData>>
-    suspend fun getPokemonByName(name: String): Flow<Result<PokemonDetailsRestApiModel>>
-    suspend fun getPokemonById(id: String): Flow<Result<PokemonDetailsRestApiModel>>
+    suspend fun getPokemonById(id: Int): Flow<Result<PokemonDetailsRestApiModel>>
 }

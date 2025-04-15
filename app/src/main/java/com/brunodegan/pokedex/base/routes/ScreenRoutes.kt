@@ -7,10 +7,5 @@ object HomeRoute
 
 @Serializable
 data class DetailsRoute(
-    val id: String
+    val id: Int?,
 )
-
-enum class ScreenRoutes(name: String) {
-    HOME("Home"),
-    DETAILS("Details")
-}

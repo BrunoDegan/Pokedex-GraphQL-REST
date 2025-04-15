@@ -6,8 +6,8 @@ import com.google.gson.annotations.SerializedName
 data class PokemonDetailsRestApiModel(
     @SerializedName("id") val id: Int?,
     @SerializedName("name") val name: String?,
-    @SerializedName("height") val height: Int?,
-    @SerializedName("weight") val weight: Int?,
+    @SerializedName("height") val height: Float?,
+    @SerializedName("weight") val weight: Float?,
     @SerializedName("types") val types: List<PokemonTypes>?,
     @SerializedName("abilities") val abilities: List<Abilities>?,
     @SerializedName("species") val species: Species?,
@@ -23,10 +23,6 @@ data class Abilities(
 data class Ability(
     @SerializedName("name")
     val name: String?,
-) : ApiData()
-
-data class Form(
-    val name: String?, val url: String?
 ) : ApiData()
 
 data class Species(

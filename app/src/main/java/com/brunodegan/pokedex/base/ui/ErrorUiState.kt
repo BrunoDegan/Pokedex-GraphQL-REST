@@ -2,9 +2,7 @@ package com.brunodegan.pokedex.base.ui
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -45,65 +43,54 @@ fun ErrorUiState(
                     )
                 )
             ),
-        contentAlignment = Alignment.Center,
     ) {
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = modifier
-                .fillMaxSize()
+        Text(
+            text = errorData.errorMsg,
+            style = MaterialTheme.typography.titleLarge,
+            overflow = TextOverflow.Visible,
+            maxLines = integerResource(R.integer.card_lines),
+            textAlign = TextAlign.Center,
+            color = Color.White,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(dimensionResource(R.dimen.double_padding))
+                .align(Alignment.Center)
+        )
+        Spacer(
+            modifier = Modifier
                 .padding(
-                    start = dimensionResource(R.dimen.double_padding),
-                    end = dimensionResource(R.dimen.double_padding)
+                    top = dimensionResource(R.dimen.double_padding),
+                    bottom = dimensionResource(R.dimen.double_padding)
                 )
-        ) {
+                .wrapContentSize()
+        )
+        Button(
+            contentPadding = PaddingValues(dimensionResource(R.dimen.base_padding)),
+            elevation = ButtonDefaults.elevatedButtonElevation(
+                pressedElevation = dimensionResource(
+                    R.dimen.card_elevation
+                )
+            ),
+            shape = ButtonDefaults.elevatedShape,
+            border = BorderStroke(
+                dimensionResource(R.dimen.tiny_padding), color = colorResource(R.color.teal_700)
+            ),
+            modifier = Modifier
+                .background(Color.Transparent)
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .padding(dimensionResource(R.dimen.double_padding))
+                .align(Alignment.BottomCenter),
+            onClick = {
+                onRetryButtonClicked()
+            }) {
             Text(
-                text = errorData.errorMsg,
-                style = MaterialTheme.typography.titleLarge,
-                overflow = TextOverflow.Visible,
-                maxLines = integerResource(R.integer.card_lines),
-                textAlign = TextAlign.Center,
-                color = Color.White
-            )
-            Spacer(
+                text = stringResource(R.string.try_again_label),
                 modifier = Modifier
-                    .wrapContentHeight()
-                    .fillMaxWidth()
-                    .padding(
-                        top = dimensionResource(R.dimen.base_padding),
-                        bottom = dimensionResource(R.dimen.base_padding)
-                    )
-            )
-            Button(
-                contentPadding = PaddingValues(dimensionResource(R.dimen.base_padding)),
-                elevation = ButtonDefaults.elevatedButtonElevation(
-                    pressedElevation = dimensionResource(
-                        R.dimen.card_elevation
-                    )
-                ),
-                shape = ButtonDefaults.elevatedShape,
-                border = BorderStroke(
-                    dimensionResource(R.dimen.tiny_padding), color = colorResource(R.color.teal_700)
-                ),
-                modifier = Modifier
-                    .background(Color.Transparent)
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .padding(
-                        top = dimensionResource(R.dimen.double_padding),
-                        start = dimensionResource(R.dimen.double_padding),
-                    ),
-                onClick = {
-                    onRetryButtonClicked()
-                }) {
-                Text(
-                    text = stringResource(R.string.try_again_label),
-                    modifier = Modifier
-                        .wrapContentSize()
-                        .padding(dimensionResource(R.dimen.card_padding))
+                    .wrapContentSize()
+                    .padding(dimensionResource(R.dimen.card_padding))
 
-                )
-            }
+            )
         }
     }
 }

@@ -32,10 +32,11 @@ fun PokemonAppBar(
             )
         },
         navigationIcon = {
-            IconButton(onClick = onBackButtonClicked) {
+            IconButton(enabled = true, onClick = onBackButtonClicked) {
                 Icon(
-                    imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back",
+                    tint = MaterialTheme.colorScheme.secondaryContainer
                 )
             }
         },

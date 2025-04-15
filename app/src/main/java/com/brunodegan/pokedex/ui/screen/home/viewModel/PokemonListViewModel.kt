@@ -39,7 +39,7 @@ class PokemonListViewModel(
         initialValue = PokemonListUiState.Initial,
     )
 
-    fun onEvent(event: PokemonListUiEvents, onCardClicked: (String) -> Unit) {
+    fun onEvent(event: PokemonListUiEvents, onCardClicked: (Int) -> Unit) {
         when (event) {
             is PokemonListUiEvents.OnRetryButtonClickedUiEvent -> {
                 val errorMessage = event.errorMessage
@@ -47,7 +47,7 @@ class PokemonListViewModel(
             }
 
             is PokemonListUiEvents.OnPokemonClickedUiEvent -> {
-                val pokemonId = event.pokemonId
+                val pokemonId = event.id
                 onCardClicked(pokemonId)
             }
         }
