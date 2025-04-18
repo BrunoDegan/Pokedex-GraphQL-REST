@@ -9,23 +9,21 @@ import org.koin.core.annotation.Factory
 
 @Factory
 class PokemonDetailsViewDataMapper :
-    BaseMapper<PokemonDetailsRestApiModel, PokemonDetailsViewData> {
+    BaseMapper<PokemonDetailsRestApiModel?, PokemonDetailsViewData> {
 
-    override fun map(input: PokemonDetailsRestApiModel): PokemonDetailsViewData {
+    override fun map(input: PokemonDetailsRestApiModel?): PokemonDetailsViewData {
         return PokemonDetailsViewData(
-            id = input.id.toString(),
-            name = input.name ?: "",
-            height = input.height.toString(),
-            weight = input.weight.toString(),
-            imgUrl = input.sprites?.other?.dreamWorld?.frontDefault ?: "",
-            types = input.types.getTypesList(),
-            species = input.species?.name ?: "",
-            stats = input.stats.toStatsList()
+            name = input?.species?.name.orEmpty(),
+            height = input?.height?.toString() ?: "",
+            weight = input?.weight?.toString() ?: "",
+            imgUrl = input?.sprites?.other?.dreamWorld?.frontDefault ?: "",
+            types = input?.types.getTypesList(),
+            stats = input?.stats.toStatsList()
         )
     }
 
     private fun List<Stats>?.toStatsList(): List<Pair<String, String>> {
-        return this?.mapNotNull { statItem ->
+        return this?.map { statItem ->
             val statName = statItem.stat?.name
             Pair(statName ?: "Unknown Stat", "${statItem.baseStat}")
         } ?: emptyList()

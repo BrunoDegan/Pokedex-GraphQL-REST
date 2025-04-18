@@ -1,5 +1,9 @@
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.ScrollableDefaults
 import androidx.compose.foundation.layout.Arrangement
@@ -25,10 +29,14 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
@@ -52,6 +60,7 @@ import coil.size.Scale
 import com.brunodegan.pokedex.R
 import com.brunodegan.pokedex.base.ui.ErrorUiState
 import com.brunodegan.pokedex.base.ui.LoaderUiState
+import com.brunodegan.pokedex.base.ui.ObserveAsEvent
 import com.brunodegan.pokedex.base.ui.SnackbarUiStateHolder
 import com.brunodegan.pokedex.data.metrics.TrackScreen
 import com.brunodegan.pokedex.ui.models.PokemonListViewData
@@ -82,21 +91,23 @@ fun HomeScreen(
     LaunchedEffect(Unit) {
         viewModel.getPokemons(errorMessage = errorMessage)
     }
+
+    ObserveAsEvent(events = viewModel.snackbarState) { event ->
+        when (event) {
+            is SnackbarUiStateHolder.SnackbarUi -> {
+                onShowSnackbar(event.msg)
+            }
+        }
+    }
+
     HomeScreen(
-        scrollBehavior = scrollBehavior,
-        onShowSnackbar = onShowSnackbar,
-        state = uiState,
-        viewModel = viewModel,
-        onEvent = {
+        scrollBehavior = scrollBehavior, state = uiState, onEvent = {
             viewModel.onEvent(
-                event = it,
-                onCardClicked = onCardClicked
+                event = it, onCardClicked = onCardClicked
             )
-        },
-        modifier = modifier
+        }, modifier = modifier
     )
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -104,29 +115,7 @@ private fun HomeScreen(
     scrollBehavior: TopAppBarScrollBehavior,
     state: PokemonListUiState,
     onEvent: (PokemonListUiEvents) -> Unit,
-    onShowSnackbar: (String) -> Unit,
-    viewModel: PokemonListViewModel,
     modifier: Modifier,
-) {
-    SnackbarUiState(
-        onSnackbarEvent = onShowSnackbar, viewModel = viewModel
-    )
-
-    HandleUiState(
-        scrollBehavior = scrollBehavior,
-        state = state,
-        onEvent = onEvent,
-        modifier = modifier
-    )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun HandleUiState(
-    scrollBehavior: TopAppBarScrollBehavior,
-    state: PokemonListUiState,
-    onEvent: (PokemonListUiEvents) -> Unit,
-    modifier: Modifier
 ) {
     val errorMessage = stringResource(R.string.http_response_generic_error_message)
 
@@ -137,9 +126,7 @@ private fun HandleUiState(
 
         is PokemonListUiState.Success -> {
             SuccessState(
-                scrollBehavior = scrollBehavior,
-                modifier = modifier,
-                viewData = state.viewData
+                scrollBehavior = scrollBehavior, modifier = modifier, viewData = state.viewData
             ) {
                 onEvent(PokemonListUiEvents.OnPokemonClickedUiEvent(it))
             }
@@ -156,19 +143,6 @@ private fun HandleUiState(
 
         is PokemonListUiState.Loading -> {
             LoaderUiState()
-        }
-    }
-}
-
-@Composable
-fun SnackbarUiState(
-    viewModel: PokemonListViewModel, onSnackbarEvent: (String) -> Unit
-) {
-    val snackbarState by viewModel.snackbarState.collectAsStateWithLifecycle()
-
-    LaunchedEffect(snackbarState) {
-        if (snackbarState != null) {
-            onSnackbarEvent((snackbarState as SnackbarUiStateHolder.SnackbarUi).msg)
         }
     }
 }
@@ -202,20 +176,26 @@ private fun PokemonCard(
     val cardPadding = dimensionResource(R.dimen.card_padding)
     val LocalCardsPadding = compositionLocalOf { cardPadding }
 
-    val imageRequest = ImageRequest.Builder(LocalContext.current)
-        .data(viewData.imgUrl)
-        .decoderFactory(SvgDecoder.Factory()).scale(Scale.FIT)
-        .crossfade(true)
-        .placeholder(R.drawable.pokeball_icon)
-        .error(R.drawable.error_img)
-        .build()
+    var isCardClicked by remember { mutableStateOf(false) }
+
+    val cardColor by animateColorAsState(
+        targetValue = if (isCardClicked) {
+            Color.Yellow
+        } else {
+            MaterialTheme.colorScheme.primaryContainer
+        }, animationSpec = spring(
+            stiffness = Spring.StiffnessLow,
+            dampingRatio = Spring.DampingRatioHighBouncy,
+        ), label = "card_anim"
+    )
+
+    val imageRequest = ImageRequest.Builder(LocalContext.current).data(viewData.imgUrl)
+        .decoderFactory(SvgDecoder.Factory()).scale(Scale.FIT).crossfade(true)
+        .placeholder(R.drawable.pokeball_icon).error(R.drawable.error_img).build()
 
     CompositionLocalProvider(LocalCardsPadding provides cardPadding) {
         Card(
-            colors = CardDefaults.elevatedCardColors().copy(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                contentColor = MaterialTheme.colorScheme.surface
-            ),
+            colors = CardDefaults.elevatedCardColors(cardColor),
             shape = RectangleShape,
             elevation = CardDefaults.cardElevation(dimensionResource(R.dimen.card_elevation)),
             border = BorderStroke(
@@ -227,8 +207,10 @@ private fun PokemonCard(
                 .padding(all = LocalCardsPadding.current)
                 .clickable(
                     onClick = {
+                        isCardClicked = !isCardClicked
                         onCardClicked.invoke(viewData.id)
                     })
+                .background(color = MaterialTheme.colorScheme.primaryContainer)
         ) {
             Row(
                 modifier = Modifier,
@@ -329,8 +311,6 @@ fun HomeScreenPreview() {
         scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(),
         state = PokemonListUiState.Initial,
         onEvent = {},
-        onShowSnackbar = {},
-        viewModel = TODO(),
         modifier = TODO(),
     )
 }

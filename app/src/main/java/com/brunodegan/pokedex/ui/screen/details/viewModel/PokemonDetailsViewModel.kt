@@ -9,11 +9,12 @@ import com.brunodegan.pokedex.domain.getPokemonDetailsById.GetPokemonDetailsById
 import com.brunodegan.pokedex.ui.models.PokemonDetailsViewData
 import com.brunodegan.pokedex.ui.screen.details.PokemonDetailsUiEvents
 import com.brunodegan.pokedex.ui.screen.details.PokemonDetailsUiState
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -21,16 +22,12 @@ import org.koin.android.annotation.KoinViewModel
 
 @KoinViewModel
 class PokemonViewModelDetails(
-    private val getPokemonDetailsByIdUseCase: GetPokemonDetailsByIdUseCase,
+    private val useCase: GetPokemonDetailsByIdUseCase,
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
-    private val _snackbarState = MutableSharedFlow<SnackbarUiStateHolder>()
-    val snackbarState = _snackbarState.stateIn(
-        viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = null,
-    )
+    private val _snackbarState = Channel<SnackbarUiStateHolder>()
+    val snackbarState = _snackbarState.receiveAsFlow()
 
     private val _uiState =
         MutableStateFlow<PokemonDetailsUiState>(PokemonDetailsUiState.Initial)
@@ -52,7 +49,7 @@ class PokemonViewModelDetails(
                         )
                     )
                 }
-                _snackbarState.emit(SnackbarUiStateHolder.SnackbarUi(errorMessage))
+                _snackbarState.send(SnackbarUiStateHolder.SnackbarUi(errorMessage))
                 return@launch
             }
 
@@ -61,12 +58,11 @@ class PokemonViewModelDetails(
 
             if (savedData == null) {
                 runCatching {
-                    getPokemonDetailsByIdUseCase.invoke(id = id)
+                    useCase(id = id)
                         .onStart {
                             _uiState.update { PokemonDetailsUiState.Loading }
                         }.collectLatest { response ->
                             if (response != null) {
-                                savedStateHandle[POKEMON_DETAILS_DATA_BUNDLE_KEY] = response
                                 _uiState.update { PokemonDetailsUiState.Success(response) }
                             }
                         }
@@ -78,7 +74,7 @@ class PokemonViewModelDetails(
                             )
                         )
                     }
-                    _snackbarState.emit(SnackbarUiStateHolder.SnackbarUi(errorMessage))
+                    _snackbarState.send(SnackbarUiStateHolder.SnackbarUi(errorMessage))
                 }
             } else {
                 _uiState.update { PokemonDetailsUiState.Success(savedData) }
@@ -87,10 +83,8 @@ class PokemonViewModelDetails(
     }
 
     fun onEvent(event: PokemonDetailsUiEvents) {
-        when (event) {
-            is PokemonDetailsUiEvents.OnRetryButtonClicked -> {
-                getPokemonDetails(id = event.id, errorMessage = event.errorMessage)
-            }
+        if (event is PokemonDetailsUiEvents.OnRetryButtonClicked) {
+            getPokemonDetails(id = event.id, errorMessage = event.errorMessage)
         }
     }
 

@@ -4,5 +4,5 @@ import com.brunodegan.pokedex.ui.models.PokemonDetailsViewData
 import kotlinx.coroutines.flow.Flow
 
 interface GetPokemonDetailsByIdUseCase {
-    suspend fun invoke(id: Int): Flow<PokemonDetailsViewData?>
+    suspend operator fun invoke(id: Int): Flow<PokemonDetailsViewData?>
 }

@@ -3,7 +3,7 @@ package com.brunodegan.pokedex.data.models
 import com.brunodegan.pokedex.base.network.base.ApiData
 import com.google.gson.annotations.SerializedName
 
-data class GetAllPokemonsGraphQLResponseData(
+data class GetAllPokemonsGraphQLApiModel(
     @SerializedName("pokemon")
     val pokemon: PokemonNodes?
 ) : ApiData()

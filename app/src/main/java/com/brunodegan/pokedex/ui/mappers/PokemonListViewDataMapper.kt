@@ -1,7 +1,7 @@
 package com.brunodegan.pokedex.ui.mappers
 
 import com.brunodegan.pokedex.base.ui.BaseMapper
-import com.brunodegan.pokedex.data.models.GetAllPokemonsGraphQLResponseData
+import com.brunodegan.pokedex.data.models.GetAllPokemonsGraphQLApiModel
 import com.brunodegan.pokedex.data.models.PokemonAbilities
 import com.brunodegan.pokedex.data.models.PokemonGraphQLTypes
 import com.brunodegan.pokedex.data.models.PokemonImages
@@ -10,8 +10,8 @@ import org.koin.core.annotation.Factory
 
 @Factory
 class PokemonListViewDataMapper :
-    BaseMapper<GetAllPokemonsGraphQLResponseData?, List<PokemonListViewData>> {
-    override fun map(input: GetAllPokemonsGraphQLResponseData?): List<PokemonListViewData> {
+    BaseMapper<GetAllPokemonsGraphQLApiModel?, List<PokemonListViewData>> {
+    override fun map(input: GetAllPokemonsGraphQLApiModel?): List<PokemonListViewData> {
 
         val pokemonListViewDataList = mutableListOf<PokemonListViewData>()
         input?.pokemon?.pokemonNodes?.forEach { apiData ->

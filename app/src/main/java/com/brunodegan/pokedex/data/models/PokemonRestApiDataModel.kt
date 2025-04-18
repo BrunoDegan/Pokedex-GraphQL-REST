@@ -4,13 +4,11 @@ import com.brunodegan.pokedex.base.network.base.ApiData
 import com.google.gson.annotations.SerializedName
 
 data class PokemonDetailsRestApiModel(
-    @SerializedName("id") val id: Int?,
-    @SerializedName("name") val name: String?,
+    @SerializedName("species") val species: Species?,
     @SerializedName("height") val height: Float?,
     @SerializedName("weight") val weight: Float?,
     @SerializedName("types") val types: List<PokemonTypes>?,
     @SerializedName("abilities") val abilities: List<Abilities>?,
-    @SerializedName("species") val species: Species?,
     @SerializedName("sprites") val sprites: PokemonSprites?,
     @SerializedName("stats") val stats: List<Stats>?
 ) : ApiData()
@@ -42,14 +40,14 @@ data class Stats(
     val stat: Stat?
 ) : ApiData()
 
-data class PokemonType(
+data class TypeName(
     @SerializedName("name")
     val name: String?,
 ) : ApiData()
 
 data class PokemonTypes(
     @SerializedName("type")
-    val type: PokemonType?
+    val type: TypeName?
 ) : ApiData()
 
 data class PokemonSpriteDreamWorld(

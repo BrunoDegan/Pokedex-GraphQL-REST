@@ -2,11 +2,14 @@ package com.brunodegan.pokedex.ui.screen.details
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -18,6 +21,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -41,6 +45,7 @@ import coil.request.ImageRequest
 import com.brunodegan.pokedex.R
 import com.brunodegan.pokedex.base.ui.ErrorUiState
 import com.brunodegan.pokedex.base.ui.LoaderUiState
+import com.brunodegan.pokedex.base.ui.ObserveAsEvent
 import com.brunodegan.pokedex.base.ui.SnackbarUiStateHolder
 import com.brunodegan.pokedex.data.metrics.TrackScreen
 import com.brunodegan.pokedex.ui.models.PokemonDetailsViewData
@@ -70,14 +75,20 @@ fun DetailsScreen(
         viewModel.getPokemonDetails(id = id, errorMessage = errorMessage)
     }
 
+    ObserveAsEvent(events = viewModel.snackbarState) { event ->
+        when (event) {
+            is SnackbarUiStateHolder.SnackbarUi -> {
+                onShowSnackbar(event.msg)
+            }
+        }
+    }
+    
     DetailsScreen(
         id = id,
         scrollBehavior = scrollBehavior,
-        onShowSnackbar = onShowSnackbar,
         onEvent = { event ->
             viewModel.onEvent(event)
         },
-        viewModel = viewModel,
         uiState = uiState,
         modifier = modifier
     )
@@ -86,31 +97,6 @@ fun DetailsScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DetailsScreen(
-    id: Int?,
-    scrollBehavior: TopAppBarScrollBehavior,
-    onEvent: (PokemonDetailsUiEvents) -> Unit,
-    onShowSnackbar: (String) -> Unit,
-    viewModel: PokemonViewModelDetails,
-    modifier: Modifier = Modifier,
-    uiState: PokemonDetailsUiState
-) {
-    SnackbarUiState(
-        onSnackbarEvent = onShowSnackbar, viewModel = viewModel
-    )
-
-    HandleUiState(
-        scrollBehavior = scrollBehavior,
-        uiState = uiState,
-        id = id,
-        modifier = modifier
-    ) {
-        onEvent(it)
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun HandleUiState(
     id: Int?,
     scrollBehavior: TopAppBarScrollBehavior,
     uiState: PokemonDetailsUiState,
@@ -126,9 +112,7 @@ private fun HandleUiState(
 
         is PokemonDetailsUiState.Success -> {
             SuccessState(
-                scrollBehavior = scrollBehavior,
-                modifier = modifier,
-                viewData = uiState.viewData
+                scrollBehavior = scrollBehavior, modifier = modifier, viewData = uiState.viewData
             )
         }
 
@@ -148,19 +132,6 @@ private fun HandleUiState(
 
         is PokemonDetailsUiState.Loading -> {
             LoaderUiState()
-        }
-    }
-}
-
-@Composable
-fun SnackbarUiState(
-    viewModel: PokemonViewModelDetails, onSnackbarEvent: (String) -> Unit
-) {
-    val snackbarState by viewModel.snackbarState.collectAsStateWithLifecycle()
-
-    if (snackbarState != null) {
-        LaunchedEffect(snackbarState) {
-            onSnackbarEvent((snackbarState as SnackbarUiStateHolder.SnackbarUi).msg)
         }
     }
 }
@@ -211,11 +182,6 @@ private fun SuccessState(
                             viewData.name,
                             style = MaterialTheme.typography.headlineMedium,
                             fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            "ID: ${viewData.id}",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         // Display types as chips (if available)
                         if (viewData.types.isNotEmpty()) {
@@ -282,11 +248,24 @@ fun StatItem(name: String, value: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = dimensionResource(R.dimen.small_padding)),
+            .padding(
+                top = dimensionResource(R.dimen.base_padding),
+                bottom = dimensionResource(R.dimen.base_padding)
+            ),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(name, style = MaterialTheme.typography.bodyMedium)
-        Text(value, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+        Box(
+            modifier = Modifier
+                .height(dimensionResource(R.dimen.stats_box_height))
+                .fillMaxWidth(value.toFloat() / 100)
+                .clip(RoundedCornerShape(dimensionResource(R.dimen.tiny_padding)))
+                .background(MaterialTheme.colorScheme.primary)
+                .padding(
+                    start = dimensionResource(R.dimen.small_padding),
+                    end = dimensionResource(R.dimen.small_padding)
+                )
+        )
     }
 }
 
@@ -335,6 +314,14 @@ fun getTypeColor(type: String): Color {
 
 @Composable
 @Preview
+@OptIn(ExperimentalMaterial3Api::class)
 fun DetailsScreenPreview() {
-
+    DetailsScreen(
+        id = null,
+        scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(),
+        modifier = Modifier,
+        onShowSnackbar = {},
+        onNavigateUp = {},
+        viewModel = koinViewModel()
+    )
 }

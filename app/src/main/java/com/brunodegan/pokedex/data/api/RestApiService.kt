@@ -14,6 +14,6 @@ interface RestApiService {
 
     companion object {
         const val REST_API_BASE_URL = "https://pokeapi.co/api/v2/"
-        private const val POKEMON_DETAIL_BY_ID = "pokemon/{id}/"
+        private const val POKEMON_DETAIL_BY_ID = "pokemon/{id}"
     }
 }
