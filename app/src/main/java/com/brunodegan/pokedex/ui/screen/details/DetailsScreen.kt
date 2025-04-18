@@ -49,6 +49,8 @@ import com.brunodegan.pokedex.base.ui.ObserveAsEvent
 import com.brunodegan.pokedex.base.ui.SnackbarUiStateHolder
 import com.brunodegan.pokedex.data.metrics.TrackScreen
 import com.brunodegan.pokedex.ui.models.PokemonDetailsViewData
+import com.brunodegan.pokedex.ui.screen.details.events.PokemonDetailsUiEvents
+import com.brunodegan.pokedex.ui.screen.details.state.PokemonDetailsUiState
 import com.brunodegan.pokedex.ui.screen.details.viewModel.PokemonViewModelDetails
 import org.koin.androidx.compose.koinViewModel
 
@@ -82,12 +84,12 @@ fun DetailsScreen(
             }
         }
     }
-    
+
     DetailsScreen(
         id = id,
         scrollBehavior = scrollBehavior,
         onEvent = { event ->
-            viewModel.onEvent(event)
+            viewModel.onUiEvent(event)
         },
         uiState = uiState,
         modifier = modifier

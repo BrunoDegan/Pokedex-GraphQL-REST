@@ -1,4 +1,4 @@
-package com.brunodegan.pokedex.ui.screen.home
+package com.brunodegan.pokedex.ui.screen.home.events
 
 sealed interface PokemonListUiEvents {
     data class OnPokemonClickedUiEvent(val id: Int) : PokemonListUiEvents

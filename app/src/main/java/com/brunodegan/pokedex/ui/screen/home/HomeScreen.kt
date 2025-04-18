@@ -64,7 +64,7 @@ import com.brunodegan.pokedex.base.ui.ObserveAsEvent
 import com.brunodegan.pokedex.base.ui.SnackbarUiStateHolder
 import com.brunodegan.pokedex.data.metrics.TrackScreen
 import com.brunodegan.pokedex.ui.models.PokemonListViewData
-import com.brunodegan.pokedex.ui.screen.home.PokemonListUiEvents
+import com.brunodegan.pokedex.ui.screen.home.events.PokemonListUiEvents
 import com.brunodegan.pokedex.ui.screen.home.state.PokemonListUiState
 import com.brunodegan.pokedex.ui.screen.home.viewModel.PokemonListViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -102,7 +102,7 @@ fun HomeScreen(
 
     HomeScreen(
         scrollBehavior = scrollBehavior, state = uiState, onEvent = {
-            viewModel.onEvent(
+            viewModel.onUiEvent(
                 event = it, onCardClicked = onCardClicked
             )
         }, modifier = modifier

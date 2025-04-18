@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.brunodegan.pokedex.base.errors.ErrorData
 import com.brunodegan.pokedex.base.ui.SnackbarUiStateHolder
 import com.brunodegan.pokedex.domain.getPokemonsUseCase.GetPokemonsDataUseCase
-import com.brunodegan.pokedex.ui.screen.home.PokemonListUiEvents
+import com.brunodegan.pokedex.ui.screen.home.events.PokemonListUiEvents
 import com.brunodegan.pokedex.ui.screen.home.state.PokemonListUiState
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,7 +34,7 @@ class PokemonListViewModel(
         initialValue = PokemonListUiState.Initial,
     )
 
-    fun onEvent(event: PokemonListUiEvents, onCardClicked: (Int) -> Unit) {
+    fun onUiEvent(event: PokemonListUiEvents, onCardClicked: (Int) -> Unit) {
         when (event) {
             is PokemonListUiEvents.OnRetryButtonClickedUiEvent -> {
                 val errorMessage = event.errorMessage

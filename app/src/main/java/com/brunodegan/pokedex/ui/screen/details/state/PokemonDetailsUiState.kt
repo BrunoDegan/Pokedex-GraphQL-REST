@@ -1,4 +1,4 @@
-package com.brunodegan.pokedex.ui.screen.details
+package com.brunodegan.pokedex.ui.screen.details.state
 
 import com.brunodegan.pokedex.base.errors.ErrorData
 import com.brunodegan.pokedex.ui.models.PokemonDetailsViewData

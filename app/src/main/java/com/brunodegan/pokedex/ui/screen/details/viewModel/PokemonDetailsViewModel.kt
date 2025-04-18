@@ -7,8 +7,8 @@ import com.brunodegan.pokedex.base.errors.ErrorData
 import com.brunodegan.pokedex.base.ui.SnackbarUiStateHolder
 import com.brunodegan.pokedex.domain.getPokemonDetailsById.GetPokemonDetailsByIdUseCase
 import com.brunodegan.pokedex.ui.models.PokemonDetailsViewData
-import com.brunodegan.pokedex.ui.screen.details.PokemonDetailsUiEvents
-import com.brunodegan.pokedex.ui.screen.details.PokemonDetailsUiState
+import com.brunodegan.pokedex.ui.screen.details.events.PokemonDetailsUiEvents
+import com.brunodegan.pokedex.ui.screen.details.state.PokemonDetailsUiState
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -82,7 +82,7 @@ class PokemonViewModelDetails(
         }
     }
 
-    fun onEvent(event: PokemonDetailsUiEvents) {
+    fun onUiEvent(event: PokemonDetailsUiEvents) {
         if (event is PokemonDetailsUiEvents.OnRetryButtonClicked) {
             getPokemonDetails(id = event.id, errorMessage = event.errorMessage)
         }
