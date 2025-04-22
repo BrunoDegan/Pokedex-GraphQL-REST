@@ -3,14 +3,20 @@ package com.brunodegan.pokedex.ui.screen.home.viewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.brunodegan.pokedex.base.errors.ErrorData
+import com.brunodegan.pokedex.base.network.base.NetworkResponse
 import com.brunodegan.pokedex.base.ui.SnackbarUiStateHolder
 import com.brunodegan.pokedex.domain.getPokemonsUseCase.GetPokemonsDataUseCase
+import com.brunodegan.pokedex.ui.mappers.PokemonListViewDataMapper
 import com.brunodegan.pokedex.ui.screen.home.events.PokemonListUiEvents
 import com.brunodegan.pokedex.ui.screen.home.state.PokemonListUiState
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -21,13 +27,14 @@ import org.koin.android.annotation.KoinViewModel
 @KoinViewModel
 class PokemonListViewModel(
     private val useCase: GetPokemonsDataUseCase,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    private val mapper: PokemonListViewDataMapper
 ) : ViewModel() {
 
     private val _snackbarState = Channel<SnackbarUiStateHolder>()
     val snackbarState = _snackbarState.receiveAsFlow()
 
-    private val _uiState =
-        MutableStateFlow<PokemonListUiState>(PokemonListUiState.Initial)
+    private val _uiState = MutableStateFlow<PokemonListUiState>(PokemonListUiState.Initial)
     val uiState = _uiState.stateIn(
         viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
@@ -50,26 +57,29 @@ class PokemonListViewModel(
 
     fun getPokemons(errorMessage: String) {
         viewModelScope.launch {
-            runCatching {
-                useCase(errorMessage = errorMessage)
-                    .onStart {
-                        _uiState.update { PokemonListUiState.Loading }
-                    }.collectLatest { response ->
-                        if (response != null) {
-                            _uiState.update { PokemonListUiState.Success(response) }
+            useCase().flowOn(dispatcher)
+                .onStart { _uiState.update { PokemonListUiState.Loading } }
+                .catch {
+                    _snackbarState.send(SnackbarUiStateHolder.SnackbarUi(errorMessage))
+                }.collectLatest { responseData ->
+                    when (responseData) {
+                        is NetworkResponse.Error -> {
+                            _uiState.update {
+                                PokemonListUiState.Error(
+                                    ErrorData(
+                                        msg = errorMessage,
+                                    )
+                                )
+                            }
+                        }
+
+                        is NetworkResponse.Success -> {
+                            _uiState.update {
+                                PokemonListUiState.Success(viewData = mapper.map(responseData.data))
+                            }
                         }
                     }
-            }.getOrElse { _ ->
-                _snackbarState.send(SnackbarUiStateHolder.SnackbarUi(errorMessage))
-
-                _uiState.update {
-                    PokemonListUiState.Error(
-                        ErrorData(
-                            errorMsg = errorMessage,
-                        )
-                    )
                 }
-            }
         }
     }
 }

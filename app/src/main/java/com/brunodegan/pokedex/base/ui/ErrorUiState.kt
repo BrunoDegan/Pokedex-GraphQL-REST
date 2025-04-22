@@ -45,7 +45,7 @@ fun ErrorUiState(
             ),
     ) {
         Text(
-            text = errorData.errorMsg,
+            text = errorData.msg,
             style = MaterialTheme.typography.titleLarge,
             overflow = TextOverflow.Visible,
             maxLines = integerResource(R.integer.card_lines),

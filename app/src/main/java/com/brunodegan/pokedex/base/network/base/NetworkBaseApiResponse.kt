@@ -1,15 +1,10 @@
 package com.brunodegan.pokedex.base.network.base
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
-import kotlinx.serialization.Serializable
+sealed class ErrorType(val message: String?) {
+    data class Generic(val customMessage: String?) : ErrorType(customMessage)
+}
 
-@Parcelize
-open class BaseApiData : Parcelable
-
-@Serializable
-data class NetworkResponse<T>(
-    val data: T,
-)
-
-typealias ApiData = BaseApiData
+sealed class NetworkResponse<T> {
+    data class Success<T>(val data: T) : NetworkResponse<T>()
+    data class Error<T>(val error: ErrorType? = null) : NetworkResponse<T>()
+}

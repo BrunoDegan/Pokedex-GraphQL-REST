@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -32,16 +33,18 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import coil.decode.SvgDecoder
 import coil.request.ImageRequest
+import coil.size.Scale
 import com.brunodegan.pokedex.R
 import com.brunodegan.pokedex.base.ui.ErrorUiState
 import com.brunodegan.pokedex.base.ui.LoaderUiState
@@ -86,13 +89,9 @@ fun DetailsScreen(
     }
 
     DetailsScreen(
-        id = id,
-        scrollBehavior = scrollBehavior,
-        onEvent = { event ->
+        id = id, scrollBehavior = scrollBehavior, onEvent = { event ->
             viewModel.onUiEvent(event)
-        },
-        uiState = uiState,
-        modifier = modifier
+        }, uiState = uiState, modifier = modifier
     )
 }
 
@@ -145,6 +144,11 @@ private fun SuccessState(
     scrollBehavior: TopAppBarScrollBehavior,
     viewData: PokemonDetailsViewData
 ) {
+
+    val imageRequest = ImageRequest.Builder(LocalContext.current).data(viewData.imgUrl)
+        .decoderFactory(SvgDecoder.Factory()).scale(Scale.FIT).crossfade(true)
+        .placeholder(R.drawable.pokeball_icon).error(R.drawable.error_img).build()
+
     Card(
         shape = RectangleShape,
         elevation = CardDefaults.cardElevation(dimensionResource(R.dimen.card_elevation)),
@@ -159,29 +163,32 @@ private fun SuccessState(
         LazyColumn(
             modifier = modifier
                 .fillMaxSize()
+                .padding(dimensionResource(R.dimen.base_padding))
                 .nestedScroll(scrollBehavior.nestedScrollConnection)
-                .padding(dimensionResource(R.dimen.double_padding))
         ) {
             item {
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.double_padding)),
+                    modifier = Modifier.wrapContentSize(),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     AsyncImage(
-                        model = ImageRequest.Builder(LocalContext.current).data(viewData.imgUrl)
-                            .crossfade(true).build(),
-                        placeholder = painterResource(R.drawable.pokeball_icon),
-                        error = painterResource(R.drawable.error_img),
+                        model = imageRequest,
                         contentDescription = "Image of ${viewData.name}",
-                        contentScale = ContentScale.Fit,
                         modifier = Modifier
                             .size(dimensionResource(R.dimen.details_image_size))
                             .clip(RoundedCornerShape(dimensionResource(R.dimen.double_padding)))
                     )
-                    Column {
+                    Column(
+                        horizontalAlignment = Alignment.Start,
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentHeight()
+                            .padding(dimensionResource(R.dimen.double_padding))
+                    ) {
                         Text(
-                            viewData.name,
+                            text = viewData.name.capitalize(Locale.current),
                             style = MaterialTheme.typography.headlineMedium,
                             fontWeight = FontWeight.Bold
                         )
@@ -201,8 +208,19 @@ private fun SuccessState(
             }
             if (viewData.stats.isNotEmpty()) {
                 item {
-                    SectionTitle("Base Stats")
-                    StatsList(viewData.stats)
+                    SectionTitle(
+                        stringResource(R.string.stats_title),
+                        modifier = Modifier.padding(
+                            top = dimensionResource(R.dimen.double_padding),
+                        )
+                    )
+                    StatsList(
+                        viewData.stats,
+                        modifier = Modifier.padding(
+                            top = dimensionResource(R.dimen.base_padding),
+                            bottom = dimensionResource(R.dimen.double_padding),
+                        )
+                    )
                 }
             }
             item {
@@ -215,7 +233,7 @@ private fun SuccessState(
                         stringResource(R.string.pokemon_weight_label), "${viewData.weight} kg"
                     )
                     MeasurementItem(
-                        stringResource(R.string.pokemon_weight_label), "${viewData.height} m"
+                        stringResource(R.string.pokemon_height_label), "${viewData.height} cm"
                     )
                 }
             }
@@ -224,21 +242,18 @@ private fun SuccessState(
 }
 
 @Composable
-fun SectionTitle(title: String) {
+fun SectionTitle(title: String, modifier: Modifier = Modifier) {
     Text(
         text = title,
         style = MaterialTheme.typography.titleMedium,
         fontWeight = FontWeight.SemiBold,
-        modifier = Modifier.padding(
-            top = dimensionResource(R.dimen.double_padding),
-            bottom = dimensionResource(R.dimen.base_padding)
-        )
+        modifier = modifier
     )
 }
 
 @Composable
-fun StatsList(stats: List<Pair<String, String>>) {
-    Column {
+fun StatsList(stats: List<Pair<String, String>>, modifier: Modifier) {
+    Column(modifier = modifier) {
         stats.forEach { (name, value) ->
             StatItem(name, value)
         }
@@ -254,9 +269,16 @@ fun StatItem(name: String, value: String) {
                 top = dimensionResource(R.dimen.base_padding),
                 bottom = dimensionResource(R.dimen.base_padding)
             ),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(name, style = MaterialTheme.typography.bodyMedium)
+        Text(
+            name.capitalize(Locale.current),
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(
+                end = dimensionResource(R.dimen.small_padding)
+            )
+        )
         Box(
             modifier = Modifier
                 .height(dimensionResource(R.dimen.stats_box_height))

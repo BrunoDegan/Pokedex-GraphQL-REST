@@ -8,4 +8,5 @@
     <string name="measurement_title">Measurements</string>"
     <string name="pokemon_weight_label">Weight</string>
     <string name="pokemon_height_label">Height</string>
+    <string name="stats_title">Base Stats</string>
 </resources>

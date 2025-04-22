@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -118,7 +119,6 @@ private fun HomeScreen(
     modifier: Modifier,
 ) {
     val errorMessage = stringResource(R.string.http_response_generic_error_message)
-
     when (state) {
         is PokemonListUiState.Initial -> {
             TrackScreen(screenName = SCREEN_NAME)
@@ -155,7 +155,10 @@ private fun SuccessState(
     viewData: List<PokemonListViewData>,
     onCardClicked: (Int) -> Unit
 ) {
+    val scrollState = rememberLazyListState()
+    
     LazyColumn(
+        state = scrollState,
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
         flingBehavior = ScrollableDefaults.flingBehavior(),

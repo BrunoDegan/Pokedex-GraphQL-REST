@@ -14,8 +14,8 @@ class PokemonDetailsViewDataMapper :
     override fun map(input: PokemonDetailsRestApiModel?): PokemonDetailsViewData {
         return PokemonDetailsViewData(
             name = input?.species?.name.orEmpty(),
-            height = input?.height?.toString() ?: "",
-            weight = input?.weight?.toString() ?: "",
+            height = input?.height?.times(10).toString(),
+            weight = input?.weight?.times(0.1).toString(),
             imgUrl = input?.sprites?.other?.dreamWorld?.frontDefault ?: "",
             types = input?.types.getTypesList(),
             stats = input?.stats.toStatsList()
